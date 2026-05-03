@@ -1,0 +1,4503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMART Dr. | Smart Hospital Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --surface2: #f1f3f4;
+  --surface3: #e8eaed;
+  --border: #dadce0;
+  --accent: #1a73e8;
+  --accent2: #1557b0;
+  --accent3: #34a853;
+  --warning: #fbbc04;
+  --danger: #ea4335;
+  --text: #202124;
+  --text2: #5f6368;
+  --text3: #3c4043;
+  --green: #34a853;
+  --purple: #8b5cf6;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --glow: 0 0 12px rgba(26,115,232,0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── PAGES ─── */
+.page { display: none; min-height: 100vh; }
+.page.active { display: flex; flex-direction: column; }
+
+/* ════════════════════════════════════════
+   LOGIN PAGE
+════════════════════════════════════════ */
+#login-page {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(26,115,232,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(52,168,83,0.04) 0%, transparent 60%),
+    var(--bg);
+}
+
+.login-grid {
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(26,115,232,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,115,232,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridShift 20s linear infinite;
+}
+@keyframes gridShift { from { transform: translateY(0); } to { transform: translateY(60px); } }
+
+.login-wrap {
+  position: relative; z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 60px;
+  max-width: 1000px;
+  width: 90%;
+  align-items: center;
+}
+
+.login-hero { padding: 20px; }
+.login-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.2);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 32px;
+  letter-spacing: 1px;
+}
+.login-badge .dot { width: 6px; height: 6px; background: var(--accent3); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.5;transform:scale(1.5);} }
+
+.login-hero h1 {
+  font-family: var(--font-head);
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 800;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+.login-hero h1 span { color: var(--accent); }
+.login-hero p { font-size: 16px; color: var(--text2); line-height: 1.7; max-width: 440px; }
+
+.login-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 40px;
+}
+.stat-item { display: block; }
+.stat-num {
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.stat-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: var(--shadow), var(--glow);
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  color: var(--bg);
+}
+.logo-text { font-family: var(--font-head); font-size: 20px; font-weight: 700; }
+.logo-text span { color: var(--accent); }
+
+.role-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.role-btn {
+  padding: 10px 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.role-btn i { display: block; font-size: 18px; margin-bottom: 6px; }
+.role-btn:hover, .role-btn.active {
+  background: rgba(0,212,255,0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.form-group { margin-bottom: 18px; }
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.form-row .form-group { margin-bottom: 0; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 8px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+.form-control {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: all .2s;
+  outline: none;
+}
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+}
+.form-control::placeholder { color: var(--text3); }
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--bg);
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .25s;
+  letter-spacing: .5px;
+  margin-top: 4px;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,255,0.3); }
+.btn-primary:active { transform: translateY(0); }
+
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--text3);
+}
+.login-footer a { color: var(--accent); text-decoration: none; }
+
+/* ════════════════════════════════════════
+   MAIN LAYOUT
+════════════════════════════════════════ */
+#main-app {
+  flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  transition: width .3s;
+}
+
+.sidebar-header {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.sidebar-logo .logo-icon { width: 36px; height: 36px; font-size: 16px; border-radius: 10px; }
+.sidebar-logo .logo-text { font-family: var(--font-head); font-size: 17px; font-weight: 700; }
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+.sidebar-nav { flex: 1; padding: 16px 12px; }
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin: 16px 0 8px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 2px;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+.nav-link i { width: 18px; text-align: center; font-size: 15px; }
+.nav-link:hover { background: var(--surface2); color: var(--text); }
+.nav-link.active { background: rgba(0,212,255,0.1); color: var(--accent); border-color: rgba(0,212,255,0.2); }
+.nav-link .badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .15s;
+  border: none;
+  background: none;
+  width: 100%;
+  font-family: var(--font-body);
+}
+.logout-btn:hover { background: rgba(255,71,87,0.1); }
+
+/* ─── CONTENT AREA ─── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.topbar-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; }
+.topbar-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.topbar-left { flex: 1; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.icon-btn {
+  width: 38px; height: 38px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 15px;
+  transition: all .2s;
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.main-content { flex: 1; padding: 32px; }
+
+/* ─── PANELS ─── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ─── STATS ROW ─── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--c, var(--accent));
+}
+.stat-card:hover { border-color: var(--c, var(--accent)); }
+.stat-card-icon {
+  width: 40px; height: 40px;
+  background: rgba(var(--rgb, 0,212,255),0.12);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  color: var(--c, var(--accent));
+  margin-bottom: 16px;
+}
+.stat-card-num {
+  font-family: var(--font-head);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-card-label { font-size: 13px; color: var(--text2); }
+.stat-card-delta {
+  font-size: 12px;
+  color: var(--green);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.card-header h3 { font-family: var(--font-head); font-size: 16px; font-weight: 700; flex: 1; }
+.card-body { padding: 24px; }
+
+/* ─── TABLE ─── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid rgba(30,45,66,0.5); transition: background .15s; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 14px 16px; font-size: 14px; color: var(--text2); }
+tbody td:first-child { color: var(--text); font-weight: 500; }
+
+.pid-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: rgba(0,212,255,0.1);
+  color: var(--accent);
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(0,212,255,0.2);
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+.status-active { background: rgba(0,200,150,0.12); color: var(--green); border: 1px solid rgba(0,200,150,0.2); }
+.status-pending { background: rgba(255,170,0,0.12); color: var(--warning); border: 1px solid rgba(255,170,0,0.2); }
+.status-critical { background: rgba(255,71,87,0.12); color: var(--danger); border: 1px solid rgba(255,71,87,0.2); }
+.status-discharged { background: rgba(139,92,246,0.12); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); }
+
+.action-btns { display: flex; gap: 6px; }
+.btn-sm {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-body);
+  transition: all .15s;
+}
+.btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-accent { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(--accent); }
+.btn-accent:hover { background: rgba(0,212,255,0.2); }
+.btn-danger { background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.2); color: var(--danger); }
+.btn-success { background: rgba(0,200,150,0.1); border: 1px solid rgba(0,200,150,0.2); color: var(--green); }
+
+/* ─── FORM GRID ─── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.form-full { grid-column: 1 / -1; }
+
+.input-group { position: relative; }
+.input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; pointer-events: none; }
+.input-group .form-control { padding-left: 40px; }
+
+select.form-control { cursor: pointer; }
+select.form-control option { background: var(--surface2); }
+textarea.form-control { resize: vertical; min-height: 80px; }
+
+/* ─── TABS ─── */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.tab-btn {
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ─── PATIENT PORTAL ─── */
+.portal-hero {
+  background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,200,150,0.06));
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.portal-avatar {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--bg);
+  flex-shrink: 0;
+}
+.portal-info h2 { font-family: var(--font-head); font-size: 22px; font-weight: 700; }
+.portal-info .pid { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-top: 4px; }
+.portal-info .meta { font-size: 13px; color: var(--text2); margin-top: 6px; }
+.portal-actions { margin-left: auto; display: flex; gap: 10px; }
+
+/* ─── PRESCRIPTION CARD ─── */
+.rx-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.rx-card::before {
+  content: '℞';
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  font-size: 28px;
+  color: var(--accent);
+  opacity: .3;
+  font-family: serif;
+}
+.rx-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.rx-date { font-family: var(--font-mono); font-size: 12px; color: var(--text3); }
+.rx-doctor { font-size: 14px; color: var(--text2); }
+.rx-meds { display: flex; flex-direction: column; gap: 8px; }
+.rx-med {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.rx-med-name { font-size: 14px; font-weight: 500; flex: 1; }
+.rx-med-dose { font-family: var(--font-mono); font-size: 12px; color: var(--accent3); }
+.rx-med-freq { font-size: 12px; color: var(--text3); }
+
+/* ─── APPOINTMENT ─── */
+.appointment-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .15s;
+  color: var(--text2);
+}
+.cal-day:hover { background: var(--surface2); color: var(--text); }
+.cal-day.today { background: rgba(0,212,255,0.15); color: var(--accent); font-weight: 600; }
+.cal-day.has-slot { position: relative; }
+.cal-day.has-slot::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--green); border-radius: 50%; }
+.cal-day.selected { background: var(--accent); color: var(--bg); font-weight: 700; }
+.cal-header-day { font-size: 11px; color: var(--text3); text-align: center; padding: 8px 0; font-weight: 600; letter-spacing: .5px; }
+
+.time-slot {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+.slot-btn {
+  padding: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+  font-family: var(--font-mono);
+}
+.slot-btn:hover { border-color: var(--accent); color: var(--accent); }
+.slot-btn.selected { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+.slot-btn.booked { opacity: .35; cursor: not-allowed; }
+
+/* ─── REPORTS / CHARTS ─── */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.chart-container { position: relative; height: 220px; }
+
+.heatmap-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: transform .2s;
+}
+.heatmap-cell:hover { transform: scale(1.1); }
+
+/* ─── NOTIFICATION TOAST ─── */
+.toast-wrap {
+  position: fixed;
+  top: 20px; right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 14px;
+  min-width: 280px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideIn .3s ease;
+}
+.toast.success { border-left-color: var(--green); }
+.toast.warning { border-left-color: var(--warning); }
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(4,8,15,0.85);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 580px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  animation: modalIn .25s ease;
+}
+@keyframes modalIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+.modal-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--accent);
+  margin: 0;
+}
+.modal-body {
+  margin-bottom: 24px;
+}
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 0;
+  transition: color .2s;
+}
+.btn-close:hover {
+  color: var(--text);
+}
+.modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; }
+.modal-close { cursor: pointer; color: var(--text3); font-size: 20px; border: none; background: none; }
+.modal-close:hover { color: var(--text); }
+.modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px; }
+.btn-outline { padding: 10px 24px; border-radius: var(--radius-sm); background: none; border: 1px solid var(--border); color: var(--text2); font-family: var(--font-body); font-size: 14px; cursor: pointer; transition: all .15s; }
+.btn-outline:hover { border-color: var(--text); color: var(--text); }
+.btn-submit { padding: 10px 28px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; color: var(--bg); font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
+.btn-submit:hover { box-shadow: 0 6px 20px rgba(0,212,255,0.3); }
+
+/* ─── SEARCH BOX ─── */
+.search-box {
+  position: relative;
+  max-width: 360px;
+}
+.search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text3); }
+.search-box input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px 10px 40px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: all .2s;
+}
+.search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+.search-box input::placeholder { color: var(--text3); }
+
+/* ─── AUTOCOMPLETE ─── */
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+.autocomplete-dropdown.open { display: block; }
+.ac-item { padding: 10px 14px; font-size: 13px; color: var(--text2); cursor: pointer; transition: background .1s; }
+.ac-item:hover { background: var(--surface2); color: var(--text); }
+.ac-item strong { color: var(--accent); }
+
+/* ─── LANG TOGGLE ─── */
+.lang-toggle {
+  display: flex;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.lang-btn { padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: none; color: var(--text3); font-family: var(--font-mono); transition: all .15s; }
+.lang-btn.active { background: rgba(0,212,255,0.15); color: var(--accent); }
+
+/* ─── QR CODE ─── */
+.qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  width: fit-content;
+}
+.qr-label { color: #202124; font-size: 12px; font-weight: 600; text-align: center; }
+
+/* ─── DOCTOR TIMELINE ─── */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 0; bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -20px; top: 22px;
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 8px var(--accent);
+}
+.timeline-meta { font-size: 11px; color: var(--text3); font-family: var(--font-mono); margin-bottom: 8px; }
+.timeline-diagnosis { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+.timeline-notes { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.timeline-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+.tag-blue { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+.tag-green { background: rgba(0,200,150,0.1); color: var(--green); border: 1px solid rgba(0,200,150,0.2); }
+.tag-purple { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); }
+
+/* ─── MISC ─── */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.section-head h3 { font-family: var(--font-head); font-size: 18px; font-weight: 700; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-state i { font-size: 48px; margin-bottom: 16px; display: block; opacity: .4; }
+.empty-state p { font-size: 14px; }
+
+.progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+/* ════════════════════════════════════════
+   BILLING PAGE
+════════════════════════════════════════ */
+#billing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.billing-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  flex: 1;
+}
+
+.billing-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.billing-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.billing-header p {
+  font-size: 1.1rem;
+  color: var(--text2);
+}
+
+.billing-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .billing-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.bill-details, .payment-section {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 30px;
+  box-shadow: var(--shadow);
+}
+
+.bill-card, .payment-card {
+  height: 100%;
+}
+
+.bill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.bill-header h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0;
+}
+
+.bill-id {
+  background: var(--surface2);
+  color: var(--text2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-family: var(--font-mono);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row.total {
+  border-top: 2px solid var(--accent);
+  margin-top: 10px;
+  padding-top: 20px;
+}
+
+.info-row .label {
+  font-weight: 500;
+  color: var(--text2);
+}
+
+.info-row .value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.info-row.total .value.amount {
+  font-size: 1.3rem;
+  color: var(--accent3);
+}
+
+.payment-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.payment-header h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.payment-header p {
+  color: var(--text2);
+  font-size: 1rem;
+}
+
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.qr-container {
+  background: white;
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.qr-info {
+  text-align: center;
+}
+
+.qr-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent3);
+  margin-bottom: 5px;
+}
+
+.qr-note {
+  color: var(--text2);
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.qr-details {
+  background: var(--surface2);
+  padding: 15px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text3);
+  line-height: 1.4;
+}
+
+.qr-details div {
+  margin-bottom: 5px;
+}
+
+.qr-details div:last-child {
+  margin-bottom: 0;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  background: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: var(--glow);
+}
+
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--surface3);
+}
+
+/* Payment Confirmation Modal */
+.payment-confirm {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.confirm-icon {
+  font-size: 3rem;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.confirm-details h4 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: var(--text);
+}
+
+.confirm-amount, .confirm-bill {
+  font-size: 1.1rem;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+.confirm-note {
+  color: var(--text3);
+  font-size: 0.9rem;
+  margin-top: 15px;
+}
+
+@media (max-width: 480px) {
+  .billing-container {
+    padding: 20px 15px;
+  }
+  
+  .billing-header h1 {
+    font-size: 2rem;
+  }
+  
+  .payment-actions {
+    flex-direction: column;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 999px;
+  transition: 0.2s ease;
+}
+
+.switch .slider::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: 0.2s ease;
+}
+
+.switch input:checked + .slider {
+  background: var(--accent);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+body.dark-mode {
+  background: #10131a;
+  color: #e8eaed;
+}
+
+body.dark-mode .page,
+body.dark-mode .content,
+body.dark-mode .topbar,
+body.dark-mode .sidebar,
+body.dark-mode .panel,
+body.dark-mode .card,
+body.dark-mode .modal,
+body.dark-mode .toast {
+  background: #131824;
+  color: #e8eaed;
+  border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-mode .sidebar {
+  background: #11141c;
+}
+
+body.dark-mode .topbar {
+  background: #121525;
+}
+
+body.dark-mode .sidebar-footer,
+body.dark-mode .logout-btn,
+body.dark-mode .btn-outline {
+  border-color: rgba(255,255,255,0.12);
+}
+
+body.dark-mode .form-control,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode input {
+  background: #151b26;
+  color: #e8eaed;
+  border-color: rgba(255,255,255,0.12);
+}
+
+body.dark-mode .btn-primary,
+body.dark-mode .btn-accent {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+body.dark-mode .toast {
+  background: #1f2430;
+}
+</style>
+</head>
+<body>
+
+<!-- ════ TOASTS ════ -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ════ LOGIN PAGE ════ -->
+<div id="login-page" class="page active">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+  <div class="login-wrap">
+    <div class="login-hero">
+      <div class="login-badge">
+        <span class="dot"></span>
+        SMART Dr. — Hospital Management System
+      </div>
+      <h1>Smart <span>Hospital</span><br>Management<br>System</h1>
+      <p>Unified platform for patients, doctors, and administrators — streamlining care from registration to discharge.</p>
+      <div class="login-stats">
+        <div class="stat-item">
+          <div class="stat-num">2,840</div>
+          <div class="stat-label">Active Patients</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">148</div>
+          <div class="stat-label">Doctors</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">99.8%</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+      </div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon"><i class="fas fa-hospital-alt"></i></div>
+        <div class="logo-text">SMART <span>Dr.</span></div>
+      </div>
+      <div class="role-selector">
+        <button class="role-btn active" onclick="setRole('admin',this)">
+          <i class="fas fa-shield-alt"></i>Admin
+        </button>
+        <button class="role-btn" onclick="setRole('doctor',this)">
+          <i class="fas fa-user-md"></i>Doctor
+        </button>
+        <button class="role-btn" onclick="setRole('patient',this)">
+          <i class="fas fa-user-injured"></i>Patient
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Username / Patient ID</label>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" class="form-control" id="loginUser" placeholder="admin@smartdr.in" value="admin@smartdr.in">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" class="form-control" id="loginPass" placeholder="••••••••" value="password">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="doLogin()">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+      <div class="login-footer" style="margin-top:16px;">
+        Demo credentials:
+        <br>Admin: admin@smartdr.in / password
+        <br>Doctor: dr.priya@smartdr.in / doc123
+        <br>Patient: arjun@smartdr.in / patient123
+        <br><a href="#" onclick="openForgotPassword()">Forgot Password?</a>
+      </div>
+      <div class="login-footer" style="margin-top:10px;font-size:13px;color:var(--text2);">
+        New patient? <a href="#" onclick="openSelfRegister()">Self-register here</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MAIN APP ════ -->
+<div id="main-app" class="page">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-hospital-alt"></i></div>
+        <div class="logo-text">SMART <span>Dr.</span></div>
+      </div>
+      <div class="user-chip">
+        <div class="user-avatar" id="sidebarAvatarEl" style="background:linear-gradient(135deg,#1a73e8,#34a853);color:#ffffff">A</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Admin User</div>
+          <div class="user-role" id="sidebarRole">System Admin</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-sub" id="topbarSub">Thursday, April 30, 2026</div>
+      </div>
+      <div class="topbar-actions">
+          <div class="lang-toggle">
+          <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+          <button class="lang-btn" onclick="setLang('te',this)">తె</button>
+          <button class="lang-btn" onclick="setLang('hi',this)">हि</button>
+        </div>
+        <div class="icon-btn" onclick="openNotifications()"><i class="fas fa-bell"></i></div>
+        <div class="icon-btn" onclick="openSettings()"><i class="fas fa-cog"></i></div>
+      </div>
+    </div>
+    <div class="main-content">
+      <!-- Admin Panels -->
+      <div class="panel" id="panel-dashboard"><!-- filled by JS --></div>
+      <div class="panel" id="panel-patients"><!-- filled by JS --></div>
+      <div class="panel" id="panel-register"><!-- filled by JS --></div>
+      <div class="panel" id="panel-appointments"><!-- filled by JS --></div>
+      <div class="panel" id="panel-doctors"><!-- filled by JS --></div>
+      <div class="panel" id="panel-labs"><!-- filled by JS --></div>
+      <div class="panel" id="panel-payments"><!-- filled by JS --></div>
+      <div class="panel" id="panel-reports"><!-- filled by JS --></div>
+      <!-- Doctor Panels -->
+      <div class="panel" id="panel-today"><!-- filled by JS --></div>
+      <div class="panel" id="panel-console"><!-- filled by JS --></div>
+      <!-- Patient Panels -->
+      <div class="panel" id="panel-portal"><!-- filled by JS --></div>
+      <div class="panel" id="panel-book"><!-- filled by JS --></div>
+      <div class="panel" id="panel-bills"><!-- filled by JS --></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL ════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Modal</div>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ════ BILLING PAGE ════ -->
+<div id="billing-page" class="page">
+  <!-- Content will be populated by renderBillingPage() -->
+</div>
+
+<script>
+// ─── GLOBAL STATE ───
+const state = {
+  role: 'admin',
+  user: null,
+  lang: 'en',
+  patients: [
+    { id:'SDR-2026-0001', name:'Arjun Reddy', age:34, gender:'Male', contact:'9876543210', illness:'Hypertension', status:'active', doctor:'Dr. Priya Sharma', dept:'Cardiology', blood:'B+', admitted:'2026-04-22', lastVisit:'2026-04-29' },
+    { id:'SDR-2026-0002', name:'Lakshmi Devi', age:58, gender:'Female', contact:'9845123456', illness:'Diabetes Mellitus', status:'active', doctor:'Dr. Ravi Kumar', dept:'Endocrinology', blood:'O+', admitted:'2026-04-25', lastVisit:'2026-04-28' },
+    { id:'SDR-2026-0003', name:'Suresh Babu', age:45, gender:'Male', contact:'9123456789', illness:'Acute Appendicitis', status:'discharged', doctor:'Dr. Anita Rao', dept:'Surgery', blood:'A-', admitted:'2026-04-18', lastVisit:'2026-04-26' },
+    { id:'SDR-2026-0004', name:'Meera Nair', age:29, gender:'Female', contact:'9988776655', illness:'Pneumonia', status:'critical', doctor:'Dr. Vikram Singh', dept:'Pulmonology', blood:'AB+', admitted:'2026-04-27', lastVisit:'2026-04-30' },
+    { id:'SDR-2026-0005', name:'Kiran Rao', age:62, gender:'Male', contact:'8765432100', illness:'Coronary Artery Disease', status:'pending', doctor:'Dr. Priya Sharma', dept:'Cardiology', blood:'O-', admitted:'2026-04-30', lastVisit:'2026-04-30' },
+  ],
+  doctors: [
+    { id:'DOC-001', name:'Dr. Priya Sharma', dept:'Cardiology', patients:18, rating:4.9, available:true },
+    { id:'DOC-002', name:'Dr. Ravi Kumar', dept:'Endocrinology', patients:14, rating:4.7, available:true },
+    { id:'DOC-003', name:'Dr. Anita Rao', dept:'Surgery', patients:22, rating:4.8, available:false },
+    { id:'DOC-004', name:'Dr. Vikram Singh', dept:'Pulmonology', patients:11, rating:4.6, available:true },
+  ],
+  medicines: ['Metformin 500mg','Amlodipine 5mg','Atorvastatin 20mg','Paracetamol 500mg','Omeprazole 20mg','Lisinopril 10mg','Clopidogrel 75mg','Aspirin 75mg','Azithromycin 500mg','Pantoprazole 40mg','Losartan 50mg','Gabapentin 300mg','Amoxicillin 500mg','Prednisolone 5mg','Folic Acid 5mg'],
+  appointments: [
+    { id:'APT-2026-0301', date:'2026-04-30', time:'09:00', patientId:'SDR-2026-0001', doctorId:'DOC-001', dept:'Cardiology', type:'Follow-up', status:'scheduled' },
+    { id:'APT-2026-0302', date:'2026-04-30', time:'10:30', patientId:'SDR-2026-0005', doctorId:'DOC-001', dept:'Cardiology', type:'New Patient', status:'scheduled' },
+    { id:'APT-2026-0303', date:'2026-04-30', time:'11:00', patientId:'SDR-2026-0002', doctorId:'DOC-002', dept:'Endocrinology', type:'Consultation', status:'scheduled' },
+  ],
+  bills: [
+    { id:'BILL-2026-0429', patientId:'SDR-2026-0001', date:'2026-04-29', desc:'OPD Consultation — Cardiology', amount:'₹800', status:'paid' },
+    { id:'BILL-2026-0415', patientId:'SDR-2026-0001', date:'2026-04-15', desc:'OPD Consultation + ECG', amount:'₹1,400', status:'paid' },
+    { id:'BILL-2026-0328', patientId:'SDR-2026-0001', date:'2026-03-28', desc:'OPD Consultation + Blood Tests', amount:'₹2,100', status:'paid' },
+  ],
+  transactions: [],
+  labTests: [
+    { id:'LAB-001', name:'Complete Blood Count (CBC)', category:'Hematology', price:'₹300', duration:'24 hrs', description:'RBC, WBC, Platelets count and analysis' },
+    { id:'LAB-002', name:'Lipid Profile', category:'Biochemistry', price:'₹450', duration:'24 hrs', description:'Total cholesterol, LDL, HDL, Triglycerides' },
+    { id:'LAB-003', name:'Blood Sugar (Fasting)', category:'Biochemistry', price:'₹150', duration:'12 hrs', description:'Glucose level in fasting state' },
+    { id:'LAB-004', name:'Blood Sugar (Random)', category:'Biochemistry', price:'₹100', duration:'4 hrs', description:'Random blood glucose test' },
+    { id:'LAB-005', name:'HbA1c (Glycated Hemoglobin)', category:'Biochemistry', price:'₹200', duration:'24 hrs', description:'Average blood sugar control over 3 months' },
+    { id:'LAB-006', name:'Liver Function Test (LFT)', category:'Biochemistry', price:'₹500', duration:'24 hrs', description:'SGPT, SGOT, Alkaline Phosphatase, Bilirubin' },
+    { id:'LAB-007', name:'Kidney Function Test (KFT)', category:'Biochemistry', price:'₹400', duration:'24 hrs', description:'Creatinine, BUN, Electrolytes' },
+    { id:'LAB-008', name:'Thyroid Profile (TSH)', category:'Endocrinology', price:'₹350', duration:'24 hrs', description:'TSH, Free T3, Free T4' },
+    { id:'LAB-009', name:'Vitamin D (25-OH)', category:'Biochemistry', price:'₹500', duration:'24 hrs', description:'Vitamin D serum level assessment' },
+    { id:'LAB-010', name:'ECG (Electrocardiogram)', category:'Cardiology', price:'₹200', duration:'30 mins', description:'Heart rhythm and electrical activity recording' },
+    { id:'LAB-011', name:'Chest X-Ray', category:'Radiology', price:'₹400', duration:'1 hr', description:'Posterior-Anterior (PA) and Lateral views' },
+    { id:'LAB-012', name:'Ultrasound Abdomen', category:'Radiology', price:'₹600', duration:'30 mins', description:'Abdominal organs visualization' },
+    { id:'LAB-013', name:'COVID-19 RT-PCR', category:'Microbiology', price:'₹450', duration:'24 hrs', description:'SARS-CoV-2 detection' },
+    { id:'LAB-014', name:'Urine Routine & Microscopy', category:'Clinical Pathology', price:'₹200', duration:'24 hrs', description:'Urinalysis with microscopic examination' },
+    { id:'LAB-015', name:'Stool Routine', category:'Clinical Pathology', price:'₹150', duration:'24 hrs', description:'Stool examination for parasites and blood' },
+  ],
+  labOrders: [
+    { id:'ORD-001', patientId:'SDR-2026-0001', testId:'LAB-001', requestedBy:'Dr. Priya Sharma', date:'2026-04-30', status:'pending', result:null },
+    { id:'ORD-002', patientId:'SDR-2026-0002', testId:'LAB-003', requestedBy:'Dr. Ravi Kumar', date:'2026-04-28', status:'completed', result:'112 mg/dL (Normal)' },
+  ],
+  paymentMethods: [
+    { id:'card', label:'Credit/Debit Card', icon:'fa-credit-card', active:true },
+    { id:'debit', label:'Debit Card', icon:'fa-credit-card', active:true },
+    { id:'upi', label:'UPI', icon:'fa-mobile-alt', active:true },
+    { id:'netbanking', label:'Net Banking', icon:'fa-university', active:true },
+    { id:'wallet', label:'Digital Wallet', icon:'fa-wallet', active:true },
+    { id:'insurance', label:'Insurance', icon:'fa-shield-alt', active:true },
+    { id:'cash', label:'Cash at Counter', icon:'fa-money-bill-alt', active:true },
+  ],
+  users: [
+    { role:'admin', username:'admin@smartdr.in', password:'password', name:'Admin User', initials:'A', color:'linear-gradient(135deg,#1a73e8,#34a853)', colorText:'#ffffff', roleLabel:'System Admin' },
+    { role:'doctor', username:'dr.priya@smartdr.in', password:'doc123', name:'Dr. Priya Sharma', initials:'PS', color:'linear-gradient(135deg,#8b5cf6,#6d28d9)', colorText:'#fff', roleLabel:'Cardiologist', doctorId:'DOC-001' },
+    { role:'doctor', username:'dr.ravi@smartdr.in', password:'doc123', name:'Dr. Ravi Kumar', initials:'RK', color:'linear-gradient(135deg,#00c896,#006644)', colorText:'#fff', roleLabel:'Endocrinologist', doctorId:'DOC-002' },
+    { role:'patient', username:'arjun@smartdr.in', password:'patient123', name:'Arjun Reddy', initials:'AR', color:'linear-gradient(135deg,#00c896,#006644)', colorText:'#fff', roleLabel:'Patient · SDR-2026-0001', patientId:'SDR-2026-0001' },
+  ],
+  notifications: [
+    { id:'NTF-001', title:'Appointment Confirmed', message:'Your May 2 appointment with Dr. Priya Sharma has been confirmed.', time:'Just now', read:false },
+    { id:'NTF-002', title:'New Lab Result', message:'Your blood test result from April 28 is now available in Reports.', time:'2 hrs ago', read:false },
+    { id:'NTF-003', title:'Billing Reminder', message:'A pending bill for ₹1,200 is due on May 5.', time:'Yesterday', read:true },
+  ],
+  preferences: {
+    allowNotifications: true,
+    emailAlerts: true,
+    autoBookingReminders: false,
+    darkMode: false,
+  },
+  activeConsolePatientId: 'SDR-2026-0001',
+  nextPid: 6,
+};
+
+const i18n = {
+  en: { dashboard:'Dashboard',patients:'Patients',register:'Register Patient',appointments:'Appointments',doctors:'Doctors',labs:'Laboratory Tests',reports:'Reports',payments:'Payments',today:"Today's Patients",console:'Patient Console',portal:'My Health',book:'Book Appointment',bills:'My Bills',welcome:'Welcome back' },
+  te: { dashboard:'డాష్‌బోర్డ్',patients:'రోగులు',register:'రోగిని నమోదు',appointments:'అపాయింట్‌మెంట్లు',doctors:'వైద్యులు',labs:'ల్యాబ్ పరీక్షలు',reports:'నివేదికలు',payments:'చెల్లింపులు',today:'ఈరోజు రోగులు',console:'రోగి కన్సోల్',portal:'నా ఆరోగ్యం',book:'అపాయింట్‌మెంట్',bills:'నా బిల్లులు',welcome:'స్వాగతం' },
+  hi: { dashboard:'डैशबोर्ड',patients:'मरीज़',register:'मरीज़ पंजीकरण',appointments:'नियुक्तियाँ',doctors:'डॉक्टर',labs:'प्रयोगशाला परीक्षण',reports:'रिपोर्ट',payments:'भुगतान',today:'आज के मरीज़',console:'कंसोल',portal:'मेरा स्वास्थ्य',book:'अपॉइंटमेंट',bills:'मेरे बिल',welcome:'स्वागत है' },
+};
+
+const navConfig = {
+  admin: [
+    { id:'dashboard', icon:'fa-th-large', label:'dashboard' },
+    { id:'patients', icon:'fa-users', label:'patients', badge:'5' },
+    { id:'register', icon:'fa-user-plus', label:'register' },
+    { id:'appointments', icon:'fa-calendar-alt', label:'appointments' },
+    { id:'doctors', icon:'fa-user-md', label:'doctors' },
+    { id:'labs', icon:'fa-flask', label:'labs' },
+    { id:'payments', icon:'fa-money-bill-wave', label:'payments' },
+    { id:'reports', icon:'fa-chart-bar', label:'reports' },
+  ],
+  doctor: [
+    { id:'today', icon:'fa-stethoscope', label:'today', badge:'8' },
+    { id:'console', icon:'fa-notes-medical', label:'console' },
+    { id:'appointments', icon:'fa-calendar-alt', label:'appointments' },
+  ],
+  patient: [
+    { id:'portal', icon:'fa-heartbeat', label:'portal' },
+    { id:'book', icon:'fa-calendar-plus', label:'book' },
+    { id:'bills', icon:'fa-file-invoice-dollar', label:'bills' },
+  ],
+};
+
+// ─── AUTH ───
+function setRole(r, el) {
+  state.role = r;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const loginUser = document.getElementById('loginUser');
+  const loginPass = document.getElementById('loginPass');
+  if (r === 'admin') {
+    loginUser.value = 'admin@smartdr.in';
+    loginPass.value = 'password';
+  } else if (r === 'doctor') {
+    loginUser.value = 'dr.priya@smartdr.in';
+    loginPass.value = 'doc123';
+  } else if (r === 'patient') {
+    loginUser.value = 'arjun@smartdr.in';
+    loginPass.value = 'patient123';
+  }
+}
+
+function doLogin() {
+  const user = authenticateUser();
+  if (!user) {
+    showToast('Invalid username or password for selected role', 'warning');
+    return;
+  }
+  state.role = user.role;
+  state.user = user;
+  document.getElementById('sidebarAvatarEl').textContent = state.user.initials;
+  document.getElementById('sidebarAvatarEl').style.background = state.user.color;
+  document.getElementById('sidebarAvatarEl').style.color = state.user.colorText;
+  document.getElementById('sidebarName').textContent = state.user.name;
+  document.getElementById('sidebarRole').textContent = state.user.roleLabel;
+  buildNav();
+  showPage('main-app');
+  const firstNav = navConfig[state.role][0].id;
+  switchPanel(firstNav);
+  showToast(`${i18n[state.lang].welcome}, ${state.user.name}!`, 'success');
+}
+
+function authenticateUser() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value.trim();
+  const matched = state.users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password && u.role === state.role);
+  return matched || null;
+}
+
+function openSelfRegister() {
+  const newPid = `SDR-2026-${String(state.nextPid).padStart(4,'0')}`;
+  openModal('Patient Self-Registration', `
+    <div class="card" style="margin:0;border:none;box-shadow:none;background:transparent">
+      <div class="card-body" style="padding:0">
+        <div class="form-grid">
+          <div class="form-group"><label>Full Name *</label><input class="form-control" id="self_name" placeholder="Patient full name"></div>
+          <div class="form-group"><label>Email *</label><input class="form-control" id="self_email" placeholder="patient@email.com"></div>
+          <div class="form-group"><label>Mobile Number *</label><input class="form-control" id="self_contact" placeholder="10-digit mobile number"></div>
+          <div class="form-group"><label>Password *</label><input type="password" class="form-control" id="self_password" placeholder="Create password"></div>
+          <div class="form-group"><label>Gender</label><select class="form-control" id="self_gender"><option>Male</option><option>Female</option><option>Other</option></select></div>
+          <div class="form-group"><label>Blood Group</label><select class="form-control" id="self_blood"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px">
+          <button class="btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn-submit" onclick="submitSelfRegistration()">Register</button>
+        </div>
+      </div>
+    </div>`);
+}
+
+function submitSelfRegistration() {
+  const name = document.getElementById('self_name').value.trim();
+  const email = document.getElementById('self_email').value.trim();
+  const contact = document.getElementById('self_contact').value.trim();
+  const password = document.getElementById('self_password').value.trim();
+  const gender = document.getElementById('self_gender').value;
+  const blood = document.getElementById('self_blood').value;
+  if (!name || !email || !contact || !password) {
+    showToast('Please fill all required fields', 'warning');
+    return;
+  }
+  const patientId = `SDR-2026-${String(state.nextPid).padStart(4,'0')}`;
+  state.patients.push({ id:patientId, name, age:0, gender, contact, illness:'N/A', status:'pending', doctor:'Not assigned', dept:'General', blood, admitted:'2026-04-30', lastVisit:'2026-04-30' });
+  state.users.push({ role:'patient', username:email, password, name, initials:name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(), color:'linear-gradient(135deg,#00c896,#006644)', colorText:'#fff', roleLabel:`Patient · ${patientId}`, patientId });
+  state.nextPid++;
+  closeModal();
+  showToast(`Registration completed! Your Patient ID is ${patientId}`, 'success');
+}
+
+function openForgotPassword() {
+  openModal('Forgot Password', `
+    <div class="card" style="margin:0;border:none;box-shadow:none;background:transparent">
+      <div class="card-body" style="padding:0">
+        <p style="margin-bottom:20px;color:var(--text2);">Enter your email address or username to receive password reset instructions.</p>
+        <div class="form-group">
+          <label>Email or Username *</label>
+          <input class="form-control" id="forgot_email" placeholder="Enter your email or username">
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px">
+          <button class="btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn-submit" onclick="submitForgotPassword()">Send Reset Link</button>
+        </div>
+      </div>
+    </div>`);
+}
+
+function submitForgotPassword() {
+  const email = document.getElementById('forgot_email').value.trim();
+  if (!email) {
+    showToast('Please enter your email or username', 'warning');
+    return;
+  }
+  // Check if user exists
+  const user = state.users.find(u => u.username === email);
+  if (!user) {
+    showToast('No account found with this email/username', 'error');
+    return;
+  }
+  // In a real system, this would send an email. For demo purposes, we'll show a success message
+  closeModal();
+  showToast('Password reset link sent to your email (demo mode)', 'success');
+}
+
+function doLogout() {
+  showPage('login-page');
+  showToast('Logged out successfully', '');
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── NAVIGATION ───
+function buildNav() {
+  const nav = document.getElementById('sidebarNav');
+  const items = navConfig[state.role];
+  nav.innerHTML = `<div class="nav-section-label">Navigation</div>` +
+    items.map(item => `
+      <div class="nav-link" id="nav-${item.id}" onclick="switchPanel('${item.id}')">
+        <i class="fas ${item.icon}"></i>
+        <span data-key="${item.label}">${i18n[state.lang][item.label]}</span>
+        ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
+      </div>`).join('');
+}
+
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('panel-'+id);
+  if (panel) { panel.classList.add('active'); renderPanel(id); }
+  const navEl = document.getElementById('nav-'+id);
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('topbarTitle').textContent = i18n[state.lang][id] || id;
+}
+
+// ─── LANG ───
+function setLang(lang, el) {
+  state.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const k = el.dataset.key;
+    if (i18n[lang][k]) el.textContent = i18n[lang][k];
+  });
+  const activePanel = document.querySelector('.panel.active');
+  if (activePanel) {
+    const id = activePanel.id.replace('panel-','');
+    document.getElementById('topbarTitle').textContent = i18n[lang][id] || id;
+  }
+}
+
+// ─── PANEL RENDERER ───
+function renderPanel(id) {
+  const el = document.getElementById('panel-'+id);
+  switch(id) {
+    case 'dashboard': el.innerHTML = renderDashboard(); initCharts(); break;
+    case 'patients': el.innerHTML = renderPatients(); break;
+    case 'register': el.innerHTML = renderRegister(); break;
+    case 'appointments': el.innerHTML = renderAppointments(); break;
+    case 'doctors': el.innerHTML = renderDoctors(); break;
+    case 'labs': el.innerHTML = renderLabs(); break;
+    case 'payments': el.innerHTML = renderPayments(); break;
+    case 'reports': el.innerHTML = renderReports(); setTimeout(initReportCharts, 100); break;
+    case 'today': el.innerHTML = renderToday(); break;
+    case 'console': el.innerHTML = renderConsole(); break;
+    case 'portal': el.innerHTML = renderPortal(); break;
+    case 'book': el.innerHTML = renderBook(); initCalendar(); break;
+    case 'bills': el.innerHTML = renderBills(); break;
+  }
+}
+
+// ═══════════════════════════════════════
+// ADMIN DASHBOARD
+// ═══════════════════════════════════════
+function renderDashboard() {
+  return `
+  <div class="stats-grid">
+    ${statCard('fa-users','${state.patients.length.toLocaleString()}','Registered Patients','↑ 12 today','#00d4ff','0,212,255')}
+    ${statCard('fa-user-md','${state.doctors.length}','Available Doctors','4 on leave','#8b5cf6','139,92,246')}
+    ${statCard('fa-bed','324','Beds Occupied','76% capacity','#00c896','0,200,150')}
+    ${statCard('fa-calendar-check','91','Appointments Today','↑ 8 new','#ffaa00','255,170,0')}
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><h3>Recent Registrations</h3><button class="btn-sm btn-accent" onclick="switchPanel('patients')">View All</button></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Patient ID</th><th>Name</th><th>Department</th><th>Status</th></tr></thead>
+            <tbody>${state.patients.slice(0,4).map(p=>`<tr>
+              <td><span class="pid-badge">${p.id}</span></td>
+              <td>${p.name}</td>
+              <td>${p.dept}</td>
+              <td><span class="status-badge status-${p.status}">${p.status.charAt(0).toUpperCase()+p.status.slice(1)}</span></td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Admissions This Week</h3></div>
+      <div class="card-body"><div class="chart-container"><canvas id="admissionsChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:0">
+    <div class="card">
+      <div class="card-header"><h3>Department Load</h3></div>
+      <div class="card-body">
+        ${[['Cardiology',78,'#00d4ff'],['Orthopedics',62,'#00c896'],['Neurology',45,'#8b5cf6'],['Pediatrics',88,'#ffaa00'],['Oncology',34,'#ff4757']].map(([d,v,c])=>`
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span>${d}</span><span style="color:${c};font-family:var(--font-mono)">${v}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${v}%;background:${c}"></div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Bed Availability Heatmap</h3></div>
+      <div class="card-body">
+        <div class="heatmap-grid">
+          ${Array.from({length:24},(_,i)=>{
+            const occ = Math.random();
+            const color = occ>0.85?'#ff4757':occ>0.6?'#ffaa00':'#00c896';
+            const alpha = 0.15+occ*0.7;
+            return `<div class="heatmap-cell" style="background:${color}${Math.round(alpha*255).toString(16).padStart(2,'0')};color:${color}" title="Ward ${i+1}: ${Math.round(occ*100)}%">${i+1}</div>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;gap:16px;margin-top:16px;font-size:12px">
+          <span><span style="color:#00c896">●</span> Available</span>
+          <span><span style="color:#ffaa00">●</span> Moderate</span>
+          <span><span style="color:#ff4757">●</span> Critical</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function statCard(icon, num, label, delta, color, rgb) {
+  return `<div class="stat-card" style="--c:${color};--rgb:${rgb}">
+    <div class="stat-card-icon"><i class="fas ${icon}"></i></div>
+    <div class="stat-card-num">${num}</div>
+    <div class="stat-card-label">${label}</div>
+    <div class="stat-card-delta"><i class="fas fa-arrow-up"></i>${delta}</div>
+  </div>`;
+}
+
+function initCharts() {
+  setTimeout(() => {
+    const ctx = document.getElementById('admissionsChart');
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [{
+          label: 'Admissions',
+          data: [12,19,8,24,16,21,15],
+          borderColor: '#00d4ff',
+          backgroundColor: 'rgba(0,212,255,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#00d4ff',
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(218,220,224,0.5)' }, ticks: { color: '#5f6368' } },
+          y: { grid: { color: 'rgba(218,220,224,0.5)' }, ticks: { color: '#5f6368' } },
+        }
+      }
+    });
+  }, 100);
+}
+
+// ═══════════════════════════════════════
+// PATIENTS LIST
+// ═══════════════════════════════════════
+function renderPatients() {
+  return `
+  <div class="section-head">
+    <h3>Patient Registry</h3>
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search by name or ID..." oninput="filterPatients(this.value)"></div>
+      <button class="btn-sm btn-accent" onclick="switchPanel('register')"><i class="fas fa-plus"></i> Register</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Patient ID</th><th>Name</th><th>Age</th><th>Blood</th><th>Department</th><th>Doctor</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="patientsTbody">${renderPatientRows(state.patients)}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPatientRows(patients) {
+  return patients.map(p=>`<tr>
+    <td><span class="pid-badge">${p.id}</span></td>
+    <td>${p.name}</td>
+    <td>${p.age}</td>
+    <td><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent3)">${p.blood}</span></td>
+    <td>${p.dept}</td>
+    <td>${p.doctor}</td>
+    <td><span class="status-badge status-${p.status}">${p.status.charAt(0).toUpperCase()+p.status.slice(1)}</span></td>
+    <td><div class="action-btns">
+      <button class="btn-sm btn-ghost" onclick="viewPatient('${p.id}')"><i class="fas fa-eye"></i></button>
+      <button class="btn-sm btn-accent" onclick="editPatient('${p.id}')"><i class="fas fa-edit"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function filterPatients(q) {
+  const filtered = state.patients.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.id.toLowerCase().includes(q.toLowerCase()));
+  const tb = document.getElementById('patientsTbody');
+  if (tb) tb.innerHTML = renderPatientRows(filtered);
+}
+
+function viewPatient(id) {
+  const p = state.patients.find(pt=>pt.id===id);
+  if (!p) return;
+  openModal('Patient Details — ' + p.name, `
+    <div class="portal-hero" style="margin-bottom:20px;padding:20px 24px">
+      <div class="portal-avatar" style="width:56px;height:56px;font-size:20px">${p.name.split(' ').map(n=>n[0]).join('')}</div>
+      <div class="portal-info">
+        <h2 style="font-size:18px">${p.name}</h2>
+        <div class="pid">${p.id}</div>
+        <div class="meta">${p.age} yrs · ${p.gender} · ${p.blood} · ${p.dept}</div>
+      </div>
+    </div>
+    <div class="form-grid">
+      ${infoRow('Attending Doctor',p.doctor)}
+      ${infoRow('Illness',p.illness)}
+      ${infoRow('Contact',p.contact)}
+      ${infoRow('Status',`<span class="status-badge status-${p.status}">${p.status}</span>`)}
+      ${infoRow('Admitted',p.admitted)}
+      ${infoRow('Last Visit',p.lastVisit)}
+    </div>
+    <div style="margin-top:20px">
+      <div id="qrcode-${id}"></div>
+    </div>
+  `);
+  setTimeout(()=>{
+    new QRCode(document.getElementById(`qrcode-${id}`), {
+      text: `Patient:${p.id}|Name:${p.name}|Doctor:${p.doctor}|Date:2026-04-30`,
+      width:120,height:120,
+      colorDark:'#1a73e8',colorLight:'#ffffff',
+    });
+  },150);
+}
+
+function infoRow(label, value) {
+  return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px">
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">${label}</div>
+    <div style="font-size:14px">${value}</div>
+  </div>`;
+}
+
+function editPatient(id) {
+  const patient = state.patients.find(p => p.id === id);
+  if (!patient) return;
+
+  openModal('Edit Patient — ' + patient.name, `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Patient ID</label>
+        <div class="input-group"><i class="fas fa-id-card"></i><input type="text" class="form-control" value="${patient.id}" readonly></div>
+      </div>
+      <div class="form-group">
+        <label>Full Name *</label>
+        <div class="input-group"><i class="fas fa-user"></i><input type="text" class="form-control" id="edit_name" value="${patient.name}" placeholder="Patient full name"></div>
+      </div>
+      <div class="form-group">
+        <label>Age *</label>
+        <div class="input-group"><i class="fas fa-birthday-cake"></i><input type="number" class="form-control" id="edit_age" value="${patient.age}" placeholder="Age in years"></div>
+      </div>
+      <div class="form-group">
+        <label>Gender *</label>
+        <select class="form-control" id="edit_gender">
+          <option value="Male" ${patient.gender === 'Male' ? 'selected' : ''}>Male</option>
+          <option value="Female" ${patient.gender === 'Female' ? 'selected' : ''}>Female</option>
+          <option value="Other" ${patient.gender === 'Other' ? 'selected' : ''}>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Blood Group</label>
+        <select class="form-control" id="edit_blood">
+          <option value="A+" ${patient.blood === 'A+' ? 'selected' : ''}>A+</option>
+          <option value="A-" ${patient.blood === 'A-' ? 'selected' : ''}>A-</option>
+          <option value="B+" ${patient.blood === 'B+' ? 'selected' : ''}>B+</option>
+          <option value="B-" ${patient.blood === 'B-' ? 'selected' : ''}>B-</option>
+          <option value="AB+" ${patient.blood === 'AB+' ? 'selected' : ''}>AB+</option>
+          <option value="AB-" ${patient.blood === 'AB-' ? 'selected' : ''}>AB-</option>
+          <option value="O+" ${patient.blood === 'O+' ? 'selected' : ''}>O+</option>
+          <option value="O-" ${patient.blood === 'O-' ? 'selected' : ''}>O-</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mobile Number *</label>
+        <div class="input-group"><i class="fas fa-phone"></i><input type="tel" class="form-control" id="edit_contact" value="${patient.contact}" placeholder="10-digit mobile number"></div>
+      </div>
+      <div class="form-group">
+        <label>Assigned Doctor</label>
+        <select class="form-control" id="edit_doctor">
+          ${state.doctors.map(d => `<option value="${d.id}" ${d.name === patient.doctor ? 'selected' : ''}>${d.name} — ${d.dept}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-control" id="edit_status">
+          <option value="pending" ${patient.status === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="active" ${patient.status === 'active' ? 'selected' : ''}>Active</option>
+          <option value="critical" ${patient.status === 'critical' ? 'selected' : ''}>Critical</option>
+          <option value="discharged" ${patient.status === 'discharged' ? 'selected' : ''}>Discharged</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Presenting Illness / Chief Complaint *</label>
+        <textarea class="form-control" id="edit_illness" placeholder="Describe the patient's main symptoms or illness">${patient.illness}</textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitPatientEdit('${id}')"><i class="fas fa-save"></i> Update Patient</button>
+    </div>
+  `);
+}
+
+function submitPatientEdit(id) {
+  const patient = state.patients.find(p => p.id === id);
+  if (!patient) return;
+
+  const name = document.getElementById('edit_name').value;
+  const age = document.getElementById('edit_age').value;
+  const gender = document.getElementById('edit_gender').value;
+  const blood = document.getElementById('edit_blood').value;
+  const contact = document.getElementById('edit_contact').value;
+  const doctorId = document.getElementById('edit_doctor').value;
+  const status = document.getElementById('edit_status').value;
+  const illness = document.getElementById('edit_illness').value;
+
+  if (!name || !age || !gender || !contact || !illness) {
+    showToast('Please fill all required fields', 'warning');
+    return;
+  }
+
+  const doctor = state.doctors.find(d => d.id === doctorId);
+  const doctorName = doctor ? doctor.name : patient.doctor;
+  const dept = doctor ? doctor.dept : patient.dept;
+
+  // Update patient data
+  patient.name = name;
+  patient.age = parseInt(age);
+  patient.gender = gender;
+  patient.blood = blood;
+  patient.contact = contact;
+  patient.doctor = doctorName;
+  patient.dept = dept;
+  patient.status = status;
+  patient.illness = illness;
+  patient.lastVisit = new Date().toISOString().split('T')[0]; // Update last visit to today
+
+  showToast('Patient information updated successfully!', 'success');
+  closeModal();
+  switchPanel('patients'); // Refresh the patients list
+}
+
+// ═══════════════════════════════════════
+// REGISTER PATIENT
+// ═══════════════════════════════════════
+function renderRegister() {
+  const newPid = `SDR-2026-${String(state.nextPid).padStart(4,'0')}`;
+  return `
+  <div class="section-head"><h3>Register New Patient</h3></div>
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-id-card" style="color:var(--accent)"></i>
+      <h3>Auto-Generated ID</h3>
+      <span class="pid-badge" style="font-size:14px;padding:6px 14px">${newPid}</span>
+      <span style="font-size:12px;color:var(--text3);margin-left:8px">Will be assigned on submission</span>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <div class="input-group"><i class="fas fa-user"></i><input type="text" class="form-control" id="reg_name" placeholder="Patient full name"></div>
+        </div>
+        <div class="form-group">
+          <label>Age *</label>
+          <div class="input-group"><i class="fas fa-birthday-cake"></i><input type="number" class="form-control" id="reg_age" placeholder="Age in years"></div>
+        </div>
+        <div class="form-group">
+          <label>Gender *</label>
+          <select class="form-control" id="reg_gender">
+            <option value="">Select Gender</option>
+            <option>Male</option><option>Female</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Blood Group</label>
+          <select class="form-control" id="reg_blood">
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mobile Number *</label>
+          <div class="input-group"><i class="fas fa-phone"></i><input type="tel" class="form-control" id="reg_contact" placeholder="10-digit mobile number"></div>
+        </div>
+        <div class="form-group">
+          <label>Emergency Contact</label>
+          <div class="input-group"><i class="fas fa-phone-alt"></i><input type="tel" class="form-control" id="reg_emergency" placeholder="Emergency number"></div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-group"><i class="fas fa-envelope"></i><input type="email" class="form-control" id="reg_email" placeholder="patient@email.com"></div>
+        </div>
+        <div class="form-group">
+          <label>Assigned Doctor</label>
+          <select class="form-control" id="reg_doctor">
+            ${state.doctors.map(d=>`<option>${d.name} — ${d.dept}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label>Address</label>
+          <textarea class="form-control" id="reg_address" placeholder="Full residential address"></textarea>
+        </div>
+        <div class="form-group form-full">
+          <label>Presenting Illness / Chief Complaint *</label>
+          <textarea class="form-control" id="reg_illness" placeholder="Describe the patient's main symptoms or illness"></textarea>
+        </div>
+      </div>
+      <hr class="divider">
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button class="btn-outline" onclick="document.getElementById('reg_name').value=''">Clear Form</button>
+        <button class="btn-submit" onclick="submitRegistration()"><i class="fas fa-user-plus"></i> Register Patient</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function submitRegistration() {
+  const name = document.getElementById('reg_name').value;
+  const age = document.getElementById('reg_age').value;
+  const gender = document.getElementById('reg_gender').value;
+  const contact = document.getElementById('reg_contact').value;
+  const illness = document.getElementById('reg_illness').value;
+  if (!name||!age||!gender||!contact||!illness) { showToast('Please fill all required fields','warning'); return; }
+  const pid = `SDR-2026-${String(state.nextPid).padStart(4,'0')}`;
+  const doctorSel = document.getElementById('reg_doctor').value;
+  const doctorName = doctorSel.split(' — ')[0];
+  const dept = doctorSel.split(' — ')[1] || 'General';
+  state.patients.push({ id:pid, name, age:parseInt(age), gender, contact, illness, status:'pending', doctor:doctorName, dept, blood:document.getElementById('reg_blood').value, admitted:'2026-04-30', lastVisit:'2026-04-30' });
+  state.nextPid++;
+  showToast(`Patient registered! ID: ${pid} | OTP sent via SMS`, 'success');
+  switchPanel('patients');
+}
+
+// ═══════════════════════════════════════
+// APPOINTMENTS
+// ═══════════════════════════════════════
+function renderAppointments() {
+  const appointmentRows = state.appointments.map(a => {
+    const patient = state.patients.find(p => p.id === a.patientId) || { name:'Not assigned', id:'—' };
+    const doctor = state.doctors.find(d => d.id === a.doctorId) || { name:'Unassigned' };
+    const statusClass = a.status === 'scheduled' ? 'pending' : a.status === 'completed' ? 'active' : a.status === 'critical';
+    return `<tr>
+      <td><span style="font-family:var(--font-mono);color:var(--accent)">${a.time}</span></td>
+      <td>${patient.name}</td>
+      <td>${patient.id !== '—' ? `<span class="pid-badge">${patient.id}</span>` : '—'}</td>
+      <td>${doctor.name}</td>
+      <td>${a.dept}</td>
+      <td><span style="font-size:12px;color:var(--text2)">${a.type}</span></td>
+      <td><span class="status-badge status-${statusClass}">${a.status}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-sm btn-ghost" onclick="openAppointmentDetails('${a.id}')"><i class="fas fa-info-circle"></i></button>
+        <button class="btn-sm btn-accent" onclick="assignAppointment('${a.id}')"><i class="fas fa-user-md"></i> Assign</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  return `
+  <div class="section-head">
+    <h3>Appointment Schedule — Apr 30, 2026</h3>
+    <button class="btn-sm btn-accent" onclick="openNewAppointmentSlotModal()"><i class="fas fa-plus"></i> New Slot</button>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Patient</th><th>ID</th><th>Doctor</th><th>Department</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${appointmentRows}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openAppointmentDetails(appointmentId) {
+  const appt = state.appointments.find(a => a.id === appointmentId);
+  if (!appt) return;
+  const patient = state.patients.find(p => p.id === appt.patientId) || { name:'Not assigned', contact:'—', id:'—' };
+  const doctor = state.doctors.find(d => d.id === appt.doctorId) || { name:'Unassigned' };
+  openModal('Appointment Details', `
+    <div class="form-grid">
+      ${infoRow('Appointment ID', appt.id)}
+      ${infoRow('Patient', `${patient.name} (${patient.id})`)}
+      ${infoRow('Doctor', doctor.name)}
+      ${infoRow('Department', appt.dept)}
+      ${infoRow('Date', appt.date)}
+      ${infoRow('Time', appt.time)}
+      ${infoRow('Type', appt.type)}
+      ${infoRow('Status', appt.status)}
+    </div>`);
+}
+
+function openNewAppointmentSlotModal() {
+  openModal('Create New Slot', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Date</label>
+        <div class="input-group"><i class="fas fa-calendar-alt"></i><input type="date" class="form-control" id="new_slot_date" value="2026-04-30"></div>
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <div class="input-group"><i class="fas fa-clock"></i><input type="time" class="form-control" id="new_slot_time" value="09:00"></div>
+      </div>
+      <div class="form-group">
+        <label>Doctor</label>
+        <select class="form-control" id="new_slot_doctor">
+          ${state.doctors.map(d => `<option value="${d.id}">${d.name} — ${d.dept}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Appointment Type</label>
+        <select class="form-control" id="new_slot_type">
+          <option>Follow-up</option>
+          <option>Consultation</option>
+          <option>New Patient</option>
+          <option>Review</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-control" id="new_slot_status">
+          <option value="scheduled">Scheduled</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitNewAppointmentSlot()"><i class="fas fa-save"></i> Create Slot</button>
+    </div>
+  `);
+}
+
+function submitNewAppointmentSlot() {
+  const date = document.getElementById('new_slot_date').value;
+  const time = document.getElementById('new_slot_time').value;
+  const doctorId = document.getElementById('new_slot_doctor').value;
+  const type = document.getElementById('new_slot_type').value;
+  const status = document.getElementById('new_slot_status').value;
+
+  if (!date || !time || !doctorId || !type) {
+    showToast('Please complete all required fields', 'warning');
+    return;
+  }
+
+  const nextId = Math.max(0, ...state.appointments.map(a => parseInt(a.id.replace('APT-2026-',''), 10))) + 1;
+  const appointmentId = `APT-2026-${String(nextId).padStart(4,'0')}`;
+  const doctor = state.doctors.find(d => d.id === doctorId) || { dept:'General' };
+
+  state.appointments.push({
+    id: appointmentId,
+    date,
+    time,
+    patientId: 'UNASSIGNED',
+    doctorId,
+    dept: doctor.dept,
+    type,
+    status,
+  });
+
+  showToast('New appointment slot created successfully', 'success');
+  closeModal();
+  switchPanel('appointments');
+}
+
+function assignAppointment(appointmentId) {
+  const appt = state.appointments.find(a => a.id === appointmentId);
+  if (!appt) return;
+  openModal('Assign Doctor', `
+    <div class="form-group">
+      <label>Select Doctor</label>
+      <select class="form-control" id="assignDocSelect">
+        ${state.doctors.map(d => `<option value="${d.id}" ${d.id === appt.doctorId ? 'selected' : ''}>${d.name} — ${d.dept}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Appointment Type</label>
+      <select class="form-control" id="assignTypeSelect">
+        <option ${appt.type==='Follow-up' ? 'selected' : ''}>Follow-up</option>
+        <option ${appt.type==='Consultation' ? 'selected' : ''}>Consultation</option>
+        <option ${appt.type==='New Patient' ? 'selected' : ''}>New Patient</option>
+        <option ${appt.type==='Emergency' ? 'selected' : ''}>Emergency</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select class="form-control" id="assignStatusSelect">
+        <option ${appt.status==='scheduled' ? 'selected' : ''}>scheduled</option>
+        <option ${appt.status==='in-progress' ? 'selected' : ''}>in-progress</option>
+        <option ${appt.status==='completed' ? 'selected' : ''}>completed</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="confirmAssignAppointment('${appointmentId}')">Save Assignment</button>
+    </div>`);
+}
+
+function confirmAssignAppointment(appointmentId) {
+  const appt = state.appointments.find(a => a.id === appointmentId);
+  if (!appt) return;
+  appt.doctorId = document.getElementById('assignDocSelect').value;
+  appt.type = document.getElementById('assignTypeSelect').value;
+  appt.status = document.getElementById('assignStatusSelect').value;
+  closeModal();
+  showToast('Appointment updated with doctor assignment', 'success');
+  renderPanel('appointments');
+}
+
+// ═══════════════════════════════════════
+// DOCTORS
+// ═══════════════════════════════════════
+function renderDoctors() {
+  return `
+  <div class="section-head"><h3>Medical Staff</h3><button class="btn-sm btn-accent" onclick="openAddDoctorModal()"><i class="fas fa-plus"></i> Add Doctor</button></div>
+  <div class="three-col">
+    ${state.doctors.map(d=>`
+    <div class="card" style="margin-bottom:0">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:18px;font-weight:700;color:#fff;flex-shrink:0">
+            ${d.name.split(' ').slice(1).map(n=>n[0]).join('')}
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:15px">${d.name}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">${d.dept}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:16px">
+          <div><div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--accent)">${d.patients}</div><div style="font-size:11px;color:var(--text3)">Patients</div></div>
+          <div><div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--warning)">${d.rating}</div><div style="font-size:11px;color:var(--text3)">Rating</div></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span class="status-badge ${d.available?'status-active':'status-critical'}">${d.available?'Available':'On Leave'}</span>
+          <button class="btn-sm btn-ghost" onclick="viewDoctorProfile('${d.id}')"><i class="fas fa-folder-open"></i> Open</button>
+        </div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function viewDoctorProfile(doctorId) {
+  const doctor = state.doctors.find(d => d.id === doctorId);
+  if (!doctor) return;
+  openModal('Doctor Profile', `
+    <div class="portal-hero" style="padding:20px 24px;margin-bottom:16px">
+      <div class="portal-avatar" style="width:64px;height:64px;font-size:24px;">${doctor.name.split(' ').slice(1).map(n=>n[0]).join('')}</div>
+      <div class="portal-info">
+        <h2>${doctor.name}</h2>
+        <div class="pid">${doctor.dept} Specialist</div>
+        <div class="meta">Rating ${doctor.rating} · ${doctor.patients} patients · ${doctor.available ? 'Available' : 'On Leave'}</div>
+      </div>
+    </div>
+    <div class="form-grid">
+      ${infoRow('Doctor ID', doctor.id)}
+      ${infoRow('Department', doctor.dept)}
+      ${infoRow('Patients Assigned', doctor.patients)}
+      ${infoRow('Availability', doctor.available ? 'Available' : 'On Leave')}
+      ${infoRow('Profile Summary', 'Experienced specialist with strong follow-up care and patient education.')}
+      ${infoRow('Consultation Fees', '₹600 per visit')}
+    </div>`);
+}
+
+function openAddDoctorModal() {
+  openModal('Add Doctor', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Doctor Name *</label>
+        <div class="input-group"><i class="fas fa-user-md"></i><input type="text" class="form-control" id="new_doctor_name" placeholder="Dr. Name"></div>
+      </div>
+      <div class="form-group">
+        <label>Department *</label>
+        <div class="input-group"><i class="fas fa-clinic-medical"></i><input type="text" class="form-control" id="new_doctor_dept" placeholder="Department"></div>
+      </div>
+      <div class="form-group">
+        <label>Patients Assigned</label>
+        <div class="input-group"><i class="fas fa-users"></i><input type="number" class="form-control" id="new_doctor_patients" value="0" min="0"></div>
+      </div>
+      <div class="form-group">
+        <label>Rating</label>
+        <div class="input-group"><i class="fas fa-star"></i><input type="number" class="form-control" id="new_doctor_rating" value="4.5" step="0.1" min="0" max="5"></div>
+      </div>
+      <div class="form-group">
+        <label>Availability</label>
+        <select class="form-control" id="new_doctor_available">
+          <option value="true">Available</option>
+          <option value="false">On Leave</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitNewDoctor()"><i class="fas fa-save"></i> Add Doctor</button>
+    </div>
+  `);
+}
+
+function submitNewDoctor() {
+  const name = document.getElementById('new_doctor_name').value.trim();
+  const dept = document.getElementById('new_doctor_dept').value.trim();
+  const patients = parseInt(document.getElementById('new_doctor_patients').value, 10) || 0;
+  const rating = parseFloat(document.getElementById('new_doctor_rating').value) || 0;
+  const available = document.getElementById('new_doctor_available').value === 'true';
+
+  if (!name || !dept) {
+    showToast('Please enter doctor name and department', 'warning');
+    return;
+  }
+
+  const nextId = Math.max(0, ...state.doctors.map(d => parseInt(d.id.replace('DOC-',''), 10))) + 1;
+  const doctorId = `DOC-${String(nextId).padStart(3,'0')}`;
+
+  state.doctors.push({
+    id: doctorId,
+    name: `Dr. ${name.replace(/^Dr\.\s*/i, '')}`,
+    dept,
+    patients,
+    rating: Math.min(Math.max(rating, 0), 5),
+    available,
+  });
+
+  showToast('Doctor added successfully', 'success');
+  closeModal();
+  switchPanel('doctors');
+}
+
+// ═══════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════
+function renderReports() {
+  return `
+  <div class="section-head"><h3>Analytics & Reports</h3>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm btn-ghost" onclick="exportReportsPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+      <button class="btn-sm btn-accent" onclick="exportReportsCSV()"><i class="fas fa-file-csv"></i> Download CSV</button>
+    </div>
+  </div>
+  <div class="stats-grid" style="margin-bottom:24px">
+    ${statCard('fa-user-plus','12','Registrations Today','This week: 68','#00c896','0,200,150')}
+    ${statCard('fa-procedures','3','ICU Admissions','↓ 1 from yesterday','#ff4757','255,71,87')}
+    ${statCard('fa-sign-out-alt','7','Discharges Today','This week: 34','#8b5cf6','139,92,246')}
+    ${statCard('fa-money-bill','₹84K','Revenue Today','↑ 12% vs avg','#ffaa00','255,170,0')}
+  </div>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header"><h3>Payment Options</h3></div>
+    <div class="card-body">
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+        <div style="flex:1;min-width:220px">
+          <div style="font-size:14px;color:var(--text2);margin-bottom:10px">Enable card, UPI and insurance payment workflows for hospital collections.</div>
+          <button class="btn-sm btn-accent" onclick="downloadFinanceSummary()"><i class="fas fa-file-download"></i> Download Finance Summary</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span class="pid-badge">Card</span>
+          <span class="pid-badge">UPI</span>
+          <span class="pid-badge">Insurance</span>
+          <span class="pid-badge">Net Banking</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="charts-grid">
+    <div class="card"><div class="card-header"><h3>Top Diagnoses</h3></div>
+      <div class="card-body"><div class="chart-container"><canvas id="diagnosisChart"></canvas></div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>Doctor Workload</h3></div>
+      <div class="card-body"><div class="chart-container"><canvas id="workloadChart"></canvas></div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>Monthly Admissions</h3></div>
+      <div class="card-body"><div class="chart-container"><canvas id="monthlyChart"></canvas></div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>Revenue Breakdown</h3></div>
+      <div class="card-body"><div class="chart-container"><canvas id="revenueChart"></canvas></div></div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// LABORATORY TESTS
+// ═══════════════════════════════════════
+function renderLabs() {
+  const totalTests = state.labTests.length;
+  const completedOrders = state.labOrders.filter(o => o.status === 'completed').length;
+  const pendingOrders = state.labOrders.filter(o => o.status === 'pending').length;
+  const totalRevenue = state.labOrders.filter(o => o.status === 'completed').length * 400; // avg price
+  
+  return `
+  <div class="section-head"><h3>Laboratory Management</h3>
+    <button class="btn-sm btn-accent" onclick="showNewLabTestModal()"><i class="fas fa-plus"></i> Add Test</button>
+  </div>
+  <div class="stats-grid">
+    ${statCard('fa-flask','${totalTests}','Available Tests','Lab test catalog','#00d4ff','0,212,255')}
+    ${statCard('fa-check-circle','${completedOrders}','Completed','Test results ready','#00c896','0,200,150')}
+    ${statCard('fa-clock','${pendingOrders}','Pending','Awaiting results','#ffaa00','255,170,0')}
+    ${statCard('fa-rupee-sign','₹${totalRevenue.toLocaleString()}','Revenue','Lab test collections','#8b5cf6','139,92,246')}
+  </div>
+  
+  <div class="two-col" style="margin-bottom:24px">
+    <div class="card">
+      <div class="card-header"><h3>Test Catalogue</h3></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Test Name</th><th>Category</th><th>Price</th><th>Duration</th><th>Action</th></tr></thead>
+            <tbody>${state.labTests.map(test => `<tr>
+              <td><span style="font-weight:500">${test.name}</span><br><span style="font-size:12px;color:var(--text3)">${test.description}</span></td>
+              <td><span style="font-size:12px;background:rgba(0,212,255,0.1);color:var(--accent);padding:4px 8px;border-radius:4px">${test.category}</span></td>
+              <td style="font-family:var(--font-mono);color:var(--accent3);font-weight:500">${test.price}</td>
+              <td style="font-size:13px">${test.duration}</td>
+              <td><button class="btn-sm btn-ghost" onclick="editLabTest('${test.id}')"><i class="fas fa-edit"></i></button></td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header"><h3>Test Orders</h3></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order ID</th><th>Patient</th><th>Test</th><th>Status</th><th>Result</th><th>Action</th></tr></thead>
+            <tbody>${state.labOrders.map(order => {
+              const patient = state.patients.find(p => p.id === order.patientId);
+              const test = state.labTests.find(t => t.id === order.testId);
+              const statusClass = order.status === 'completed' ? 'active' : order.status === 'pending' ? 'pending' : 'discharged';
+              return `<tr>
+                <td><span class="pid-badge">${order.id}</span></td>
+                <td>${patient?.name || 'Unknown'}</td>
+                <td>${test?.name || 'Unknown'}</td>
+                <td><span class="status-badge status-${statusClass}">${order.status}</span></td>
+                <td><span style="font-size:12px;color:var(--text2)">${order.result || '-'}</span></td>
+                <td><div class="action-btns">
+                  ${order.status === 'pending' ? `<button class="btn-sm btn-accent" onclick="completeLabTest('${order.id}')"><i class="fas fa-check"></i> Complete</button>` : ''}
+                  <button class="btn-sm btn-ghost" onclick="viewLabOrder('${order.id}')"><i class="fas fa-eye"></i></button>
+                </div></td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function showNewLabTestModal() {
+  openModal('Add New Laboratory Test', `
+    <div class="card" style="margin:0;border:none;box-shadow:none;background:transparent">
+      <div class="card-body" style="padding:0">
+        <div class="form-grid">
+          <div class="form-group"><label>Test Name *</label><input class="form-control" id="lab_name" placeholder="e.g., Blood Sugar Test"></div>
+          <div class="form-group"><label>Category *</label><select class="form-control" id="lab_category"><option>Select Category</option><option>Hematology</option><option>Biochemistry</option><option>Microbiology</option><option>Clinical Pathology</option><option>Radiology</option><option>Cardiology</option><option>Endocrinology</option></select></div>
+          <div class="form-group"><label>Price (₹) *</label><input class="form-control" id="lab_price" placeholder="Enter price" type="number"></div>
+          <div class="form-group"><label>Duration *</label><input class="form-control" id="lab_duration" placeholder="e.g., 24 hrs"></div>
+          <div class="form-group"><label>Description</label><textarea class="form-control" id="lab_description" placeholder="Test description" style="resize:vertical;min-height:60px"></textarea></div>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px">
+          <button class="btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn-submit" onclick="submitNewLabTest()">Add Test</button>
+        </div>
+      </div>
+    </div>`);
+}
+
+function submitNewLabTest() {
+  const name = document.getElementById('lab_name').value.trim();
+  const category = document.getElementById('lab_category').value;
+  const price = document.getElementById('lab_price').value.trim();
+  const duration = document.getElementById('lab_duration').value.trim();
+  const description = document.getElementById('lab_description').value.trim();
+  
+  if (!name || category === 'Select Category' || !price || !duration) {
+    showToast('Please fill all required fields', 'warning');
+    return;
+  }
+  
+  const testId = `LAB-${String(state.labTests.length + 1).padStart(3, '0')}`;
+  state.labTests.push({
+    id: testId,
+    name,
+    category,
+    price: '₹' + price,
+    duration,
+    description
+  });
+  
+  closeModal();
+  renderPanel('labs');
+  showToast('Laboratory test added successfully', 'success');
+}
+
+function completeLabTest(orderId) {
+  const order = state.labOrders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  openModal('Enter Lab Test Result', `
+    <div class="card" style="margin:0;border:none;box-shadow:none;background:transparent">
+      <div class="card-body" style="padding:0">
+        <div class="form-group"><label>Test Result *</label><textarea class="form-control" id="lab_result" placeholder="Enter test result (e.g., Normal, 98 mg/dL (Normal), Negative)" style="min-height:80px"></textarea></div>
+        <div class="form-group"><label>Notes</label><textarea class="form-control" id="lab_notes" placeholder="Additional notes or observations" style="min-height:60px"></textarea></div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px">
+          <button class="btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn-submit" onclick="submitLabResult('${orderId}')">Submit Result</button>
+        </div>
+      </div>
+    </div>`);
+}
+
+function submitLabResult(orderId) {
+  const order = state.labOrders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const result = document.getElementById('lab_result').value.trim();
+  if (!result) {
+    showToast('Please enter test result', 'warning');
+    return;
+  }
+  
+  order.status = 'completed';
+  order.result = result;
+  
+  closeModal();
+  renderPanel('labs');
+  showToast('Lab test result submitted successfully', 'success');
+}
+
+function viewLabOrder(orderId) {
+  const order = state.labOrders.find(o => o.id === orderId);
+  const patient = state.patients.find(p => p.id === order.patientId);
+  const test = state.labTests.find(t => t.id === order.testId);
+  
+  openModal('Lab Test Order Details', `
+    <div class="form-grid">
+      ${infoRow('Order ID', order.id)}
+      ${infoRow('Patient', patient?.name || 'Unknown')}
+      ${infoRow('Patient ID', patient?.id || 'N/A')}
+      ${infoRow('Test Name', test?.name || 'Unknown')}
+      ${infoRow('Test Category', test?.category || 'N/A')}
+      ${infoRow('Test Price', test?.price || 'N/A')}
+      ${infoRow('Requested By', order.requestedBy)}
+      ${infoRow('Order Date', order.date)}
+      ${infoRow('Status', `<span class="status-badge status-${order.status === 'completed' ? 'active' : 'pending'}">${order.status}</span>`)}
+      ${infoRow('Result', order.result || '<span style="color:var(--text3)">Pending...</span>')}
+    </div>
+    <div style="margin-top:20px">
+      <button class="btn-sm btn-accent" onclick="downloadLabReport('${orderId}')"><i class="fas fa-file-pdf"></i> Download Report</button>
+    </div>
+  `);
+}
+
+function editLabTest(testId) {
+  const test = state.labTests.find(t => t.id === testId);
+  if (!test) return;
+  openModal('Edit Laboratory Test', `
+    <div class="card" style="margin:0;border:none;box-shadow:none;background:transparent">
+      <div class="card-body" style="padding:0">
+        <div class="form-grid">
+          <div class="form-group"><label>Test Name *</label><input class="form-control" id="edit_lab_name" value="${test.name}" placeholder="e.g., Blood Sugar Test"></div>
+          <div class="form-group"><label>Category *</label><select class="form-control" id="edit_lab_category"><option>Select Category</option><option ${test.category==='Hematology'?'selected':''}>Hematology</option><option ${test.category==='Biochemistry'?'selected':''}>Biochemistry</option><option ${test.category==='Microbiology'?'selected':''}>Microbiology</option><option ${test.category==='Clinical Pathology'?'selected':''}>Clinical Pathology</option><option ${test.category==='Radiology'?'selected':''}>Radiology</option><option ${test.category==='Cardiology'?'selected':''}>Cardiology</option><option ${test.category==='Endocrinology'?'selected':''}>Endocrinology</option></select></div>
+          <div class="form-group"><label>Price (₹) *</label><input class="form-control" id="edit_lab_price" value="${test.price.replace(/[₹,]/g,'')}" placeholder="Enter price" type="number"></div>
+          <div class="form-group"><label>Duration *</label><input class="form-control" id="edit_lab_duration" value="${test.duration}" placeholder="e.g., 24 hrs"></div>
+          <div class="form-group"><label>Description</label><textarea class="form-control" id="edit_lab_description" placeholder="Test description" style="resize:vertical;min-height:60px">${test.description}</textarea></div>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px">
+          <button class="btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn-submit" onclick="submitLabTestEdit('${test.id}')">Save Changes</button>
+        </div>
+      </div>
+    </div>`);
+}
+
+function submitLabTestEdit(testId) {
+  const test = state.labTests.find(t => t.id === testId);
+  if (!test) return;
+
+  const name = document.getElementById('edit_lab_name').value.trim();
+  const category = document.getElementById('edit_lab_category').value;
+  const price = document.getElementById('edit_lab_price').value.trim();
+  const duration = document.getElementById('edit_lab_duration').value.trim();
+  const description = document.getElementById('edit_lab_description').value.trim();
+
+  if (!name || category === 'Select Category' || !price || !duration) {
+    showToast('Please fill all required fields', 'warning');
+    return;
+  }
+
+  test.name = name;
+  test.category = category;
+  test.price = '₹' + price;
+  test.duration = duration;
+  test.description = description;
+
+  closeModal();
+  renderPanel('labs');
+  showToast('Laboratory test updated successfully', 'success');
+}
+
+function downloadLabReport(orderId) {
+  const order = state.labOrders.find(o => o.id === orderId);
+  if (!order) return;
+  const patient = state.patients.find(p => p.id === order.patientId);
+  const test = state.labTests.find(t => t.id === order.testId);
+  
+  const content = `
+LAB TEST REPORT
+================
+Date: ${new Date().toISOString().split('T')[0]}
+Order ID: ${order.id}
+Patient: ${patient?.name}
+Patient ID: ${patient?.id}
+Test: ${test?.name}
+Category: ${test?.category}
+Price: ${test?.price}
+
+RESULT:
+${order.result || 'Pending'}
+
+Status: ${order.status}
+Requested By: ${order.requestedBy}
+  `;
+  
+  downloadFile(`${order.id}_lab_report.txt`, content);
+  showToast('Lab report downloaded', 'success');
+}
+
+function renderPayments() {
+  const pendingBills = state.bills.filter(b => b.status !== 'paid');
+  const totalDue = pendingBills.reduce((sum, bill) => sum + Number(bill.amount.replace(/[₹,]/g, '')), 0);
+  const totalCollected = state.bills.filter(b => b.status === 'paid').reduce((sum, bill) => sum + Number(bill.amount.replace(/[₹,]/g, '')), 0);
+  const transactions = state.transactions || [];
+  return `
+  <div class="section-head"><h3>Payments & Collections</h3>
+    <button class="btn-sm btn-accent" onclick="downloadPaymentsReport()"><i class="fas fa-file-pdf"></i> Export Payments PDF</button>
+  </div>
+  <div class="stats-grid">
+    ${statCard('fa-money-check-alt',`₹${totalCollected.toLocaleString()}`,'Collected','Completed payments','#00c896','0,200,150')}
+    ${statCard('fa-clock',''+pendingBills.length,'Pending','Awaiting payment','#ffaa00','255,170,0')}
+    ${statCard('fa-wallet',`${state.paymentMethods.length}`,'Methods','Active payment channels','#00d4ff','0,212,255')}
+    ${statCard('fa-file-invoice',`₹${totalDue.toLocaleString()}`,'Total Due','Outstanding payments','#ff4757','255,71,87')}
+  </div>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header"><h3>Payment Methods</h3></div>
+    <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap">
+      ${state.paymentMethods.map(method => `<button class="btn-sm ${method.active ? 'btn-accent' : 'btn-ghost'}" onclick="togglePaymentMethod('${method.id}')"><i class="fas ${method.icon}"></i> ${method.label}</button>`).join('')}
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header"><h3>Pending Invoices</h3></div>
+    <div class="card-body" style="padding:0">
+      ${pendingBills.length === 0 ? `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending invoices right now.</p></div>` : `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Bill ID</th><th>Patient</th><th>Date</th><th>Amount</th><th>Payment</th><th>Action</th></tr></thead>
+          <tbody>${pendingBills.map(b => {
+            const patient = state.patients.find(p => p.id === b.patientId) || { name:'Unknown' };
+            return `<tr>
+              <td><span class="pid-badge">${b.id}</span></td>
+              <td>${patient.name}</td>
+              <td>${b.date}</td>
+              <td style="font-family:var(--font-mono);color:var(--accent3)">${b.amount}</td>
+              <td><select class="form-control" id="paymentMethod-${b.id}">${state.paymentMethods.map(m=>`<option value="${m.id}" ${m.active?'':'disabled'}>${m.label}</option>`).join('')}</select></td>
+              <td><button class="btn-sm btn-accent" onclick="processAdminPayment('${b.id}')"><i class="fas fa-credit-card"></i> Collect</button></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>Live Transaction Log</h3></div>
+    <div class="card-body" style="padding:0">
+      ${transactions.length === 0 ? `<div class="empty-state"><i class="fas fa-history"></i><p>No payment transactions yet.</p></div>` : `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Txn ID</th><th>Bill</th><th>Patient</th><th>Amount</th><th>Method</th><th>Status</th><th>Time</th></tr></thead>
+          <tbody>${transactions.slice().reverse().map(tx => {
+            const patient = state.patients.find(p => p.id === tx.patientId) || { name: tx.patientName || 'Unknown' };
+            return `<tr>
+              <td><span class="pid-badge">${tx.id}</span></td>
+              <td>${tx.billId}</td>
+              <td>${patient.name}</td>
+              <td style="font-family:var(--font-mono);color:var(--accent3)">₹${Number(tx.amount).toLocaleString()}</td>
+              <td>${tx.method}</td>
+              <td><span class="status-badge status-active">${tx.status}</span></td>
+              <td>${new Date(tx.timestamp).toLocaleString()}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`}
+    </div>
+  </div>`;
+}
+
+function togglePaymentMethod(methodId) {
+  state.paymentMethods = state.paymentMethods.map(m => m.id === methodId ? { ...m, active: !m.active } : m);
+  renderPanel('payments');
+  showToast(`Payment method ${methodId} ${state.paymentMethods.find(m=>m.id===methodId).active ? 'enabled' : 'disabled'}`,'success');
+}
+
+function processAdminPayment(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  const methodSelect = document.getElementById(`paymentMethod-${bill.id}`);
+  const methodId = methodSelect ? methodSelect.value : state.paymentMethods.find(m=>m.active)?.id;
+  const method = state.paymentMethods.find(m => m.id === methodId);
+  if (!method || !method.active) { showToast('Selected payment method is not active','warning'); return; }
+
+  bill.status = 'paid';
+  const amount = bill.amount.replace(/[₹,]/g, '');
+  const transaction = {
+    id: `TXN-${Date.now()}`,
+    billId: bill.id,
+    patientId: bill.patientId,
+    patientName: state.patients.find(p => p.id === bill.patientId)?.name || 'Unknown',
+    amount,
+    method: method.id,
+    status: 'completed',
+    timestamp: new Date().toISOString(),
+    reference: `${method.id}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+  };
+  if (!state.transactions) state.transactions = [];
+  state.transactions.push(transaction);
+
+  renderPanel('payments');
+  showToast(`Payment of ${bill.amount} collected via ${method.label}`, 'success');
+}
+
+function processPatientPayment(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  const methodSelect = document.getElementById(`patientPaymentMethod-${bill.id}`);
+  const methodId = methodSelect ? methodSelect.value : state.paymentMethods.find(m=>m.active)?.id;
+  const method = state.paymentMethods.find(m => m.id === methodId);
+  if (!method || !method.active) { showToast('Selected payment method is not active','warning'); return; }
+  openPaymentForm(billId, method);
+}
+
+function openPaymentForm(billId, method) {
+  const bill = state.bills.find(b => b.id === billId);
+  const patient = state.patients.find(p => p.id === bill.patientId) || { name: 'Unknown' };
+  const amount = bill.amount.replace(/[₹,]/g, '');
+  
+  let formHtml = `
+    <div class="modal-overlay" onclick="closePaymentForm()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-head">
+          <h3><i class="fas ${method.icon}"></i> ${method.label} Payment</h3>
+          <button class="btn-close" onclick="closePaymentForm()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Bill ID</label>
+            <input type="text" class="form-control" value="${bill.id}" readonly>
+          </div>
+          <div class="form-group">
+            <label>Patient</label>
+            <input type="text" class="form-control" value="${patient.name}" readonly>
+          </div>
+          <div class="form-group">
+            <label>Amount</label>
+            <input type="text" class="form-control" value="₹${amount}" readonly style="color:var(--accent3)">
+          </div>
+  `;
+  
+  if (method.id === 'card') {
+    formHtml += `
+      <div class="form-group">
+        <label>Card Number</label>
+        <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" class="form-control" id="cardName" placeholder="Full Name">
+        </div>
+        <div class="form-group">
+          <label>Expiry (MM/YY)</label>
+          <input type="text" class="form-control" id="cardExpiry" placeholder="12/25" maxlength="5">
+        </div>
+        <div class="form-group">
+          <label>CVV</label>
+          <input type="text" class="form-control" id="cardCvv" placeholder="123" maxlength="3">
+        </div>
+      </div>
+    `;
+  } else if (method.id === 'debit') {
+    formHtml += `
+      <div class="form-group">
+        <label>Debit Card Number</label>
+        <input type="text" class="form-control" id="debitCardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" class="form-control" id="debitCardName" placeholder="Full Name">
+        </div>
+        <div class="form-group">
+          <label>Expiry (MM/YY)</label>
+          <input type="text" class="form-control" id="debitCardExpiry" placeholder="12/25" maxlength="5">
+        </div>
+        <div class="form-group">
+          <label>PIN</label>
+          <input type="password" class="form-control" id="debitCardPin" placeholder="••••" maxlength="4">
+        </div>
+      </div>
+    `;
+  } else if (method.id === 'upi') {
+    formHtml += `
+      <div class="form-group">
+        <label>Hospital UPI ID</label>
+        <input type="text" class="form-control" id="upiId" placeholder="smartdr@upi" value="smartdr@upi">
+      </div>
+      <div class="form-group">
+        <label>Scan QR to Pay</label>
+        <div id="upiQrContainer" style="display:flex;justify-content:center;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;margin-top:10px"></div>
+        <div id="upiQrNote" style="margin-top:10px;font-size:13px;color:var(--text2);text-align:center"></div>
+      </div>
+      <div style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:12px;margin:12px 0;font-size:13px;color:var(--text2)">
+        <i class="fas fa-info-circle"></i> Scan the QR code to pay ₹${amount} or use the UPI ID above.
+      </div>
+    `;
+  } else if (method.id === 'netbanking') {
+    formHtml += `
+      <div class="form-group">
+        <label>Select Bank</label>
+        <select class="form-control" id="bankName">
+          <option>Select Bank</option>
+          <option>HDFC Bank</option>
+          <option>ICICI Bank</option>
+          <option>SBI</option>
+          <option>Axis Bank</option>
+          <option>Kotak Bank</option>
+          <option>Punjab National Bank</option>
+          <option>Bank of Baroda</option>
+          <option>Canara Bank</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Account Number</label>
+        <input type="text" class="form-control" id="accountNumber" placeholder="Account Number">
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" class="form-control" id="netbankingUsername" placeholder="Internet Banking Username">
+      </div>
+    `;
+  } else if (method.id === 'wallet') {
+    formHtml += `
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" class="form-control" id="walletPhone" placeholder="9876543210">
+      </div>
+      <div class="form-group">
+        <label>Wallet Provider</label>
+        <select class="form-control" id="walletProvider">
+          <option>Select Wallet</option>
+          <option>Google Pay</option>
+          <option>PhonePe</option>
+          <option>Paytm</option>
+          <option>WhatsApp Pay</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Available Balance</label>
+        <input type="number" class="form-control" id="walletBalance" placeholder="Enter available balance" min="0">
+      </div>
+    `;
+  } else if (method.id === 'insurance') {
+    formHtml += `
+      <div class="form-group">
+        <label>Policy Number</label>
+        <input type="text" class="form-control" id="policyNumber" placeholder="POL-XXXX-XXXX">
+      </div>
+      <div class="form-group">
+        <label>Insurance Company</label>
+        <select class="form-control" id="insuranceCompany">
+          <option>Select Company</option>
+          <option>Star Health</option>
+          <option>Apollo Health</option>
+          <option>Aetna</option>
+          <option>ICICI Lombard</option>
+          <option>Bajaj Allianz</option>
+          <option>Max Bupa</option>
+          <option>Care Health</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Policy Holder Name</label>
+        <input type="text" class="form-control" id="policyHolderName" placeholder="Full Name">
+      </div>
+    `;
+  } else if (method.id === 'cash') {
+    formHtml += `
+      <div style="background:rgba(0,200,150,0.1);border:1px solid rgba(0,200,150,0.2);border-radius:8px;padding:16px;margin:12px 0">
+        <div style="font-size:14px;color:var(--text);margin-bottom:12px"><i class="fas fa-money-bill-alt"></i> Cash Payment</div>
+        <div style="font-size:13px;color:var(--text2)">
+          <div style="margin-bottom:8px"><strong>Amount to Collect:</strong> ₹${amount}</div>
+          <div style="margin-bottom:12px">Please collect cash from the patient and confirm below.</div>
+          <div style="background:var(--surface2);padding:8px;border-radius:4px;color:var(--accent3)">
+            <strong>Reference:</strong> ${bill.id}
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="cashConfirm"> I confirm that ₹${amount} has been received as cash
+        </label>
+      </div>
+    `;
+  }
+  
+  formHtml += `
+        </div>
+        <div class="modal-footer">
+          <button class="btn-sm btn-ghost" onclick="closePaymentForm()">Cancel</button>
+          <button class="btn-sm btn-accent" onclick="submitPayment('${billId}', '${method.id}')"><i class="fas fa-check"></i> Process Payment</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  const modalContainer = document.getElementById('modal-container') || document.body;
+  const modal = document.createElement('div');
+  modal.id = 'payment-form-modal';
+  modal.innerHTML = formHtml;
+  modalContainer.appendChild(modal);
+
+  if (method.id === 'upi') {
+    renderUpiQr(amount);
+    const upiInput = document.getElementById('upiId');
+    if (upiInput) {
+      upiInput.addEventListener('input', () => renderUpiQr(amount));
+    }
+  }
+}
+
+function closePaymentForm() {
+  const modal = document.getElementById('payment-form-modal');
+  if (modal) modal.remove();
+}
+
+function renderUpiQr(amount) {
+  const upiIdInput = document.getElementById('upiId');
+  const upiId = upiIdInput?.value.trim() || 'smartdr@upi';
+  const container = document.getElementById('upiQrContainer');
+  const note = document.getElementById('upiQrNote');
+  if (!container) return;
+  container.innerHTML = '';
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('SMART Dr')}&am=${encodeURIComponent(amount)}&cu=INR&tn=${encodeURIComponent('Hospital Bill')}`;
+  new QRCode(container, {
+    text: upiUri,
+    width: 180,
+    height: 180,
+    colorDark: '#202124',
+    colorLight: '#ffffff'
+  });
+  if (note) note.textContent = `Scan to pay ₹${amount} to ${upiId}`;
+}
+
+async function submitPayment(billId, methodId) {
+  const bill = state.bills.find(b => b.id === billId);
+  const patient = state.patients.find(p => p.id === bill.patientId) || { name: 'Unknown' };
+  const amount = bill.amount.replace(/[₹,]/g, '');
+  
+  const details = {};
+  
+  if (methodId === 'card') {
+    details.cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    details.cardName = document.getElementById('cardName').value;
+    details.cardExpiry = document.getElementById('cardExpiry').value;
+    details.cardCvv = document.getElementById('cardCvv').value;
+  } else if (methodId === 'debit') {
+    details.debitCardNumber = document.getElementById('debitCardNumber').value.replace(/\s/g, '');
+    details.debitCardName = document.getElementById('debitCardName').value;
+    details.debitCardExpiry = document.getElementById('debitCardExpiry').value;
+    details.debitCardPin = document.getElementById('debitCardPin').value;
+  } else if (methodId === 'upi') {
+    details.upiId = document.getElementById('upiId').value;
+  } else if (methodId === 'netbanking') {
+    details.bankName = document.getElementById('bankName').value;
+    details.accountNumber = document.getElementById('accountNumber').value;
+    details.netbankingUsername = document.getElementById('netbankingUsername').value;
+  } else if (methodId === 'wallet') {
+    details.walletPhone = document.getElementById('walletPhone').value;
+    details.walletProvider = document.getElementById('walletProvider').value;
+    details.walletBalance = Number(document.getElementById('walletBalance').value);
+  } else if (methodId === 'insurance') {
+    details.policyNumber = document.getElementById('policyNumber').value;
+    details.insuranceCompany = document.getElementById('insuranceCompany').value;
+    details.policyHolderName = document.getElementById('policyHolderName').value;
+  } else if (methodId === 'cash') {
+    const confirmed = document.getElementById('cashConfirm').checked;
+    if (!confirmed) {
+      showToast('Please confirm cash receipt','warning');
+      return;
+    }
+    details.cashReceived = true;
+    details.receivedBy = state.user.name;
+  }
+  
+  try {
+    const response = await fetch('http://localhost:3001/api/process-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        billId,
+        amount,
+        method: methodId,
+        patientId: bill.patientId,
+        patientName: patient.name,
+        billDescription: bill.desc,
+        details
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      bill.status = 'paid';
+      if (!state.transactions) state.transactions = [];
+      state.transactions.push(result.transaction);
+      closePaymentForm();
+      showToast(`✓ Payment of ₹${amount} processed successfully via ${methodId}!`,'success');
+      renderPanel('payments');
+    } else {
+      showToast(`✗ Payment failed: ${result.error}`,'warning');
+    }
+  } catch (error) {
+    // Fallback for when server is not running - still record the payment locally
+    bill.status = 'paid';
+    const localTx = {
+      id: `TXN-OFF-${Date.now()}`,
+      billId,
+      patientId: bill.patientId,
+      patientName: patient.name,
+      amount,
+      method: methodId,
+      status: 'completed',
+      timestamp: new Date().toISOString(),
+      reference: `OFF-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+      details
+    };
+    if (!state.transactions) state.transactions = [];
+    state.transactions.push(localTx);
+    closePaymentForm();
+    showToast(`✓ Payment of ₹${amount} recorded via ${methodId} (offline mode)`,'success');
+    renderPanel('payments');
+  }
+}
+
+function downloadPaymentPdf(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  const patient = state.patients.find(p => p.id === bill.patientId) || { name:'Unknown', id:'—' };
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text('Payment Receipt', 20, 20);
+  doc.setFontSize(11);
+  doc.text(`Bill ID: ${bill.id}`, 20, 36);
+  doc.text(`Patient: ${patient.name} (${patient.id})`, 20, 44);
+  doc.text(`Date: ${bill.date}`, 20, 52);
+  doc.text(`Description: ${bill.desc}`, 20, 60);
+  doc.text(`Amount: ${bill.amount}`, 20, 68);
+  doc.text(`Status: ${bill.status}`, 20, 76);
+  doc.save(`${bill.id}_receipt.pdf`);
+  showToast('PDF receipt generated','success');
+}
+
+function downloadPaymentsReport() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text('Payments Report', 20, 20);
+  let y = 32;
+  state.bills.forEach(b => {
+    const patient = state.patients.find(p => p.id === b.patientId) || { name:'Unknown' };
+    doc.setFontSize(11);
+    doc.text(`${b.id} - ${patient.name} - ${b.amount} - ${b.status}`, 20, y);
+    y += 8;
+    if (y > 280) { doc.addPage(); y = 20; }
+  });
+  doc.save('payments_report.pdf');
+  showToast('Payments report PDF generated','success');
+}
+
+// ═══════════════════════════════════════
+// REPORTS EXPORT FUNCTIONS
+// ═══════════════════════════════════════
+function exportReportsPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Title
+  doc.setFontSize(18);
+  doc.text('SMART Dr. Hospital Analytics Report', 20, 25);
+
+  // Date
+  doc.setFontSize(10);
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 35);
+
+  let y = 50;
+
+  // Summary Statistics
+  doc.setFontSize(14);
+  doc.text('Summary Statistics', 20, y);
+  y += 10;
+
+  doc.setFontSize(11);
+  const totalPatients = state.patients.length;
+  const activePatients = state.patients.filter(p => p.status === 'active').length;
+  const totalDoctors = state.doctors.length;
+  const todayAppointments = state.appointments.filter(a => a.date === '2026-04-30').length;
+  const totalRevenue = state.bills.filter(b => b.status === 'paid').reduce((sum, b) => sum + parseFloat(b.amount.replace('₹', '').replace(',', '')), 0);
+
+  doc.text(`Total Patients: ${totalPatients}`, 20, y); y += 8;
+  doc.text(`Active Patients: ${activePatients}`, 20, y); y += 8;
+  doc.text(`Total Doctors: ${totalDoctors}`, 20, y); y += 8;
+  doc.text(`Today's Appointments: ${todayAppointments}`, 20, y); y += 8;
+  doc.text(`Total Revenue: ₹${totalRevenue.toLocaleString()}`, 20, y); y += 15;
+
+  // Patient Details
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.setFontSize(14);
+  doc.text('Patient Registry', 20, y);
+  y += 10;
+
+  doc.setFontSize(10);
+  state.patients.forEach(patient => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.text(`${patient.id} - ${patient.name} - ${patient.age}yrs - ${patient.gender} - ${patient.dept} - ${patient.status}`, 20, y);
+    y += 6;
+  });
+
+  y += 10;
+
+  // Doctor Details
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.setFontSize(14);
+  doc.text('Medical Staff', 20, y);
+  y += 10;
+
+  doc.setFontSize(10);
+  state.doctors.forEach(doctor => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.text(`${doctor.name} - ${doctor.dept} - ${doctor.patients} patients`, 20, y);
+    y += 6;
+  });
+
+  doc.save('hospital_analytics_report.pdf');
+  showToast('Analytics report PDF generated successfully!', 'success');
+}
+
+function exportReportsCSV() {
+  // Prepare CSV data
+  let csvContent = 'data:text/csv;charset=utf-8,';
+
+  // Summary section
+  csvContent += 'SMART Dr. Hospital Analytics Report\n';
+  csvContent += `Generated on:,${new Date().toLocaleDateString()}\n\n`;
+
+  // Statistics
+  csvContent += 'Summary Statistics\n';
+  csvContent += 'Metric,Value\n';
+  csvContent += `Total Patients,${state.patients.length}\n`;
+  csvContent += `Active Patients,${state.patients.filter(p => p.status === 'active').length}\n`;
+  csvContent += `Total Doctors,${state.doctors.length}\n`;
+  csvContent += `Today's Appointments,${state.appointments.filter(a => a.date === '2026-04-30').length}\n`;
+  const totalRevenue = state.bills.filter(b => b.status === 'paid').reduce((sum, b) => sum + parseFloat(b.amount.replace('₹', '').replace(',', '')), 0);
+  csvContent += `Total Revenue (₹),${totalRevenue}\n\n`;
+
+  // Patient data
+  csvContent += 'Patient Registry\n';
+  csvContent += 'Patient ID,Name,Age,Gender,Blood Group,Department,Doctor,Status,Admitted Date\n';
+  state.patients.forEach(patient => {
+    csvContent += `${patient.id},${patient.name},${patient.age},${patient.gender},${patient.blood},${patient.dept},${patient.doctor},${patient.status},${patient.admitted}\n`;
+  });
+
+  csvContent += '\n';
+
+  // Doctor data
+  csvContent += 'Medical Staff\n';
+  csvContent += 'Doctor ID,Name,Department,Patients Count,Rating,Available\n';
+  state.doctors.forEach(doctor => {
+    csvContent += `${doctor.id},${doctor.name},${doctor.dept},${doctor.patients},${doctor.rating},${doctor.available}\n`;
+  });
+
+  csvContent += '\n';
+
+  // Appointments data
+  csvContent += 'Appointments\n';
+  csvContent += 'Appointment ID,Date,Time,Patient ID,Doctor ID,Department,Type,Status\n';
+  state.appointments.forEach(appt => {
+    csvContent += `${appt.id},${appt.date},${appt.time},${appt.patientId},${appt.doctorId},${appt.dept},${appt.type},${appt.status}\n`;
+  });
+
+  csvContent += '\n';
+
+  // Bills data
+  csvContent += 'Billing Records\n';
+  csvContent += 'Bill ID,Patient ID,Date,Description,Amount,Status\n';
+  state.bills.forEach(bill => {
+    csvContent += `${bill.id},${bill.patientId},${bill.date},"${bill.desc}",${bill.amount},${bill.status}\n`;
+  });
+
+  // Create and trigger download
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', 'hospital_analytics_report.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('Analytics report CSV downloaded successfully!', 'success');
+}
+
+function initReportCharts() {
+  const defaults = { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#5f6368'}}} };
+  const gridColor = 'rgba(218,220,224,0.5)';
+
+  new Chart(document.getElementById('diagnosisChart'), {
+    type:'bar', data:{
+      labels:['Hypertension','Diabetes','Pneumonia','Fractures','Appendicitis','Dengue'],
+      datasets:[{data:[24,18,12,9,7,5], backgroundColor:['#00d4ff88','#8b5cf688','#00c89688','#ffaa0088','#ff475788','#00ffb388'], borderRadius:6}]
+    }, options:{...defaults, scales:{x:{ticks:{color:'#5f6368'},grid:{color:gridColor}},y:{ticks:{color:'#5f6368'},grid:{color:gridColor}}}, plugins:{legend:{display:false}}}
+  });
+
+  new Chart(document.getElementById('workloadChart'), {
+    type:'doughnut', data:{
+      labels: state.doctors.map(d=>d.name.split(' ').slice(1).join(' ')),
+      datasets:[{data:state.doctors.map(d=>d.patients), backgroundColor:['#00d4ff','#8b5cf6','#00c896','#ffaa00'], borderWidth:0, hoverOffset:8}]
+    }, options:{...defaults, cutout:'65%'}
+  });
+
+  new Chart(document.getElementById('monthlyChart'), {
+    type:'line', data:{
+      labels:['Nov','Dec','Jan','Feb','Mar','Apr'],
+      datasets:[{label:'Admissions',data:[210,185,240,220,265,284],borderColor:'#00c896',backgroundColor:'rgba(0,200,150,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#00c896'}]
+    }, options:{...defaults, scales:{x:{ticks:{color:'#5f6368'},grid:{color:gridColor}},y:{ticks:{color:'#5f6368'},grid:{color:gridColor}}}, plugins:{legend:{display:false}}}
+  });
+
+  new Chart(document.getElementById('revenueChart'), {
+    type:'bar', data:{
+      labels:['Consultation','Surgery','Pharmacy','Labs','Rooms'],
+      datasets:[{data:[32,28,18,14,8], backgroundColor:'#8b5cf6', borderRadius:6}]
+    }, options:{...defaults, scales:{x:{ticks:{color:'#5f6368'},grid:{color:gridColor}},y:{ticks:{color:'#5f6368'},grid:{color:gridColor},ticks:{callback:v=>v+'%'}}}, plugins:{legend:{display:false}}}
+  });
+}
+
+// ═══════════════════════════════════════
+// DOCTOR — TODAY'S PATIENTS
+// ═══════════════════════════════════════
+function renderToday() {
+  const doctorId = state.user?.doctorId || 'DOC-001';
+  const doctor = state.doctors.find(d => d.id === doctorId) || state.doctors[0];
+  const todayApts = state.appointments.filter(a => a.doctorId === doctorId && a.date === '2026-04-30');
+  return `
+  <div class="section-head"><h3>Today's Patients — ${doctor.name}</h3>
+    <div style="font-family:var(--font-mono);font-size:13px;color:var(--accent)">Apr 30, 2026 · ${doctor.dept}</div>
+  </div>
+  <div class="stats-grid">
+    ${statCard('fa-users',todayApts.length.toString(),'Scheduled Today','','#00d4ff','0,212,255')}
+    ${statCard('fa-check-circle',todayApts.filter(a=>a.status==='completed').length.toString(),'Seen','','#00c896','0,200,150')}
+    ${statCard('fa-clock',todayApts.filter(a=>a.status==='scheduled').length.toString(),'Waiting','','#ffaa00','255,170,0')}
+    ${statCard('fa-exclamation-triangle',todayApts.filter(a=>a.type==='Emergency').length.toString(),'Critical','','#ff4757','255,71,87')}
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Patient</th><th>ID</th><th>Time</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${todayApts.map((a,index)=>{
+            const patient = state.patients.find(p => p.id === a.patientId) || { name:'Unknown', id:'—' };
+            const sc = a.status==='completed'?'active':a.status==='in-progress'?'critical':'pending';
+            return `<tr>
+              <td style="font-family:var(--font-mono);color:var(--text3)">${index+1}</td>
+              <td>${patient.name}</td>
+              <td><span class="pid-badge">${patient.id}</span></td>
+              <td>${a.time}</td>
+              <td><span style="font-size:12px;color:var(--text2)">${a.type}</span></td>
+              <td><span class="status-badge status-${sc}">${a.status}</span></td>
+              <td><div class="action-btns">
+                <button class="btn-sm btn-accent" onclick="selectConsolePatient('${patient.id}')"><i class="fas fa-notes-medical"></i> Open</button>
+              </div></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// DOCTOR CONSOLE
+// ═══════════════════════════════════════
+function renderConsole() {
+  const doctorId = state.user?.doctorId || 'DOC-001';
+  const doctorApts = state.appointments.filter(a => a.doctorId === doctorId);
+  const activePatient = state.patients.find(p => p.id === state.activeConsolePatientId) || state.patients[0];
+  return `
+  <div class="section-head"><h3>Patient Console</h3>
+    <div class="search-box" style="max-width:300px"><i class="fas fa-search"></i><input type="text" placeholder="Search patient ID or name..."></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>My Patients</h3></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Patient</th><th>ID</th><th>Time</th><th>Status</th><th>Open</th></tr></thead>
+              <tbody>${doctorApts.map(a => {
+                const patient = state.patients.find(p => p.id === a.patientId) || { name:'Unknown', id:'—' };
+                const statusClass = a.status === 'completed' ? 'active' : a.status === 'in-progress' ? 'critical' : 'pending';
+                return `<tr>
+                  <td>${patient.name}</td>
+                  <td><span class="pid-badge">${patient.id}</span></td>
+                  <td>${a.time}</td>
+                  <td><span class="status-badge status-${statusClass}">${a.status}</span></td>
+                  <td><button class="btn-sm btn-accent" onclick="selectConsolePatient('${patient.id}')"><i class="fas fa-notes-medical"></i></button></td>
+                </tr>`;
+              }).join('')}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Add Consultation</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label>Diagnosis</label><input type="text" class="form-control" id="diagInput" placeholder="Primary diagnosis"></div>
+          <div class="form-group">
+            <label>Medications (type to search)</label>
+            <div style="position:relative">
+              <input type="text" class="form-control" id="medSearch" placeholder="Start typing medicine name..." oninput="showMedSuggestions(this.value)">
+              <div class="autocomplete-dropdown" id="medDropdown">
+                ${state.medicines.map(m=>`<div class="ac-item" onclick="selectMed('${m}')">${m}</div>`).join('')}
+              </div>
+            </div>
+            <div id="selectedMeds" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+          </div>
+          <div class="form-group"><label>Clinical Notes</label><textarea class="form-control" id="notesInput" placeholder="Examination findings, instructions..."></textarea></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Follow-up Date</label><input type="date" class="form-control" value="2026-05-14" id="followupInput"></div>
+            <div class="form-group"><label>Consultation Type</label>
+              <select class="form-control" id="consultTypeInput"><option>Follow-up</option><option>Emergency</option><option>Routine</option></select>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button class="btn-outline" onclick="saveConsultation()">Save Draft</button>
+            <button class="btn-submit" onclick="saveConsultation()"><i class="fas fa-save"></i> Save Consultation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-header"><h3>Patient Details</h3></div>
+        <div class="card-body">
+          <div class="portal-hero" style="padding:18px; margin-bottom:16px">
+            <div class="portal-avatar">${activePatient.name.split(' ').map(n=>n[0]).join('').substring(0,2)}</div>
+            <div class="portal-info">
+              <h2>${activePatient.name}</h2>
+              <div class="pid">${activePatient.id}</div>
+              <div class="meta">${activePatient.gender} · ${activePatient.blood} · ${activePatient.dept}</div>
+            </div>
+          </div>
+          <div class="form-grid cols-3" style="margin-bottom:16px">
+            ${infoRow('Contact', activePatient.contact)}
+            ${infoRow('Illness', activePatient.illness)}
+            ${infoRow('Doctor', activePatient.doctor)}
+          </div>
+          <div class="form-group">
+            <label>Refer to another doctor</label>
+            <select class="form-control" id="referDoctorSelect">
+              ${state.doctors.map(d => `<option value="${d.id}">${d.name} — ${d.dept}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button class="btn-accent btn-sm" onclick="referPatient()"><i class="fas fa-exchange-alt"></i> Refer</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Medical History</h3></div>
+        <div class="card-body">
+          <div class="timeline">
+            ${[
+              {date:'Apr 29, 2026',diag:'Hypertension — Controlled',notes:'BP 130/85. Continue current medication. ECG normal.',meds:['Amlodipine 5mg','Lisinopril 10mg'],tags:['Follow-up','Stable']},
+              {date:'Apr 15, 2026',diag:'Hypertension — Stage II',notes:'BP 155/95. Increased Amlodipine dosage. Advised low-sodium diet and daily exercise.',meds:['Amlodipine 10mg','Aspirin 75mg'],tags:['Escalated','Diet Counselling']},
+              {date:'Mar 28, 2026',diag:'Hypertension — Initial',notes:'New patient. Family history positive. Started antihypertensive therapy.',meds:['Amlodipine 5mg'],tags:['New Patient','Initial Rx']},
+            ].map(c=>`
+            <div class="timeline-item">
+              <div class="timeline-meta">${c.date}</div>
+              <div class="timeline-diagnosis">${c.diag}</div>
+              <div class="timeline-notes">${c.notes}</div>
+              <div style="margin-top:10px;font-size:12px;color:var(--text3)">Medications: <span style="color:var(--accent3)">${c.meds.join(' · ')}</span></div>
+              <div class="timeline-tags">${c.tags.map(t=>`<span class="tag tag-blue">${t}</span>`).join('')}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function showMedSuggestions(val) {
+  const dd = document.getElementById('medDropdown');
+  if (!val) { dd.classList.remove('open'); return; }
+  const matches = state.medicines.filter(m=>m.toLowerCase().includes(val.toLowerCase()));
+  dd.innerHTML = matches.map(m=>{
+    const i = m.toLowerCase().indexOf(val.toLowerCase());
+    return `<div class="ac-item" onclick="selectMed('${m}')">${m.substring(0,i)}<strong>${m.substring(i,i+val.length)}</strong>${m.substring(i+val.length)}</div>`;
+  }).join('') || '<div class="ac-item" style="color:var(--text3)">No matches</div>';
+  dd.classList.toggle('open', matches.length>0||true);
+}
+
+function selectMed(med) {
+  const cont = document.getElementById('selectedMeds');
+  const el = document.createElement('span');
+  el.className = 'tag tag-blue';
+  el.innerHTML = `${med} <span style="cursor:pointer;margin-left:4px" onclick="this.parentElement.remove()">×</span>`;
+  cont.appendChild(el);
+  document.getElementById('medSearch').value = '';
+  document.getElementById('medDropdown').classList.remove('open');
+}
+
+function saveConsultation() { showToast('Consultation saved & prescription generated','success'); }
+
+function downloadReport(name) {
+  const content = `Report: ${name}\nDate: 2026-04-30\n\nTotal Patients: ${state.patients.length}\nTotal Doctors: ${state.doctors.length}\nTotal Appointments: ${state.appointments.length}\nTotal Bills: ${state.bills.length}`;
+  downloadFile(`${name.replace(/\s+/g,'_')}.txt`, content);
+  showToast('Report downloaded successfully','success');
+}
+
+function downloadFinanceSummary() {
+  const paidBills = state.bills.filter(b => b.status === 'paid');
+  const pendingBills = state.bills.filter(b => b.status !== 'paid');
+  const totalCollected = paidBills.reduce((sum, bill) => sum + Number(bill.amount.replace(/[₹,]/g, '')), 0);
+  const totalDue = pendingBills.reduce((sum, bill) => sum + Number(bill.amount.replace(/[₹,]/g, '')), 0);
+  const totalBills = state.bills.length;
+  const summary = [
+    'SMART Dr. Finance Summary',
+    `Generated on: ${new Date().toLocaleString()}`,
+    '',
+    `Total Bills Recorded: ${totalBills}`,
+    `Total Bills Paid: ${paidBills.length}`,
+    `Total Collected Till Now: ₹${totalCollected.toLocaleString()}`,
+    `Total Outstanding Due: ₹${totalDue.toLocaleString()}`,
+    `Pending Bills: ${pendingBills.length}`,
+    '',
+    'Bills by Status:',
+    ...['paid','pending','discharged','cancelled'].filter(status => state.bills.some(b => b.status === status)).map(status => {
+      const count = state.bills.filter(b => b.status === status).length;
+      return `  ${status.charAt(0).toUpperCase() + status.slice(1)}: ${count}`;
+    }),
+    '',
+    'Active Payment Methods:',
+    ...state.paymentMethods.map(m => `  ${m.label}: ${m.active ? 'Enabled' : 'Disabled'}`),
+    '',
+    'Paid Bills Summary:',
+    ...paidBills.map(b => `  ${b.id} | ${state.patients.find(p => p.id === b.patientId)?.name || 'Unknown'} | ${b.amount} | ${b.date}`),
+    '',
+    'Pending Bills Summary:',
+    ...pendingBills.map(b => `  ${b.id} | ${state.patients.find(p => p.id === b.patientId)?.name || 'Unknown'} | ${b.amount} | ${b.date}`),
+  ].join('\n');
+
+  downloadFile('Finance_Summary.txt', summary);
+  showToast('Finance summary downloaded successfully','success');
+}
+
+function downloadFile(filename, content) {
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
+function openConsole(id, name) {
+  state.activeConsolePatientId = id;
+  switchPanel('console');
+}
+
+function selectConsolePatient(patientId) {
+  state.activeConsolePatientId = patientId;
+  switchPanel('console');
+  showToast('Patient record loaded in console', 'success');
+}
+
+function referPatient() {
+  const patient = state.patients.find(p => p.id === state.activeConsolePatientId);
+  if (!patient) return;
+  const doctorId = document.getElementById('referDoctorSelect').value;
+  const doctor = state.doctors.find(d => d.id === doctorId);
+  patient.doctor = doctor.name;
+  patient.dept = doctor.dept;
+  state.appointments.filter(a => a.patientId === patient.id).forEach(a => a.doctorId = doctorId);
+  renderPanel('console');
+  showToast(`Patient referred to ${doctor.name}`, 'success');
+}
+
+// ═══════════════════════════════════════
+// PATIENT PORTAL
+// ═══════════════════════════════════════
+function renderPortal() {
+  const patient = state.patients.find(p => p.id === state.user?.patientId) || { name:'Arjun Reddy', id:'SDR-2026-0001', age:34, gender:'Male', blood:'B+', doctor:'Dr. Priya Sharma', dept:'Cardiology' };
+  return `
+  <div class="portal-hero">
+    <div class="portal-avatar">${patient.name.split(' ').map(n=>n[0]).join('').substring(0,2)}</div>
+    <div class="portal-info">
+      <h2>${patient.name}</h2>
+      <div class="pid">${patient.id}</div>
+      <div class="meta">${patient.age} yrs · ${patient.gender} · ${patient.blood} · ${patient.doctor} · ${patient.dept}</div>
+    </div>
+    <div class="portal-actions">
+      <button class="btn-sm btn-ghost" onclick="downloadPatientRecords('${patient.id}')"><i class="fas fa-download"></i> Download Records</button>
+      <button class="btn-sm btn-accent" onclick="openEditPatientProfile()"><i class="fas fa-edit"></i> Edit Profile</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="portalTab('presc',this)"><i class="fas fa-pills"></i> Prescriptions</button>
+    <button class="tab-btn" onclick="portalTab('vitals',this)"><i class="fas fa-heartbeat"></i> Vitals</button>
+    <button class="tab-btn" onclick="portalTab('history',this)"><i class="fas fa-history"></i> History</button>
+    <button class="tab-btn" onclick="portalTab('labs',this)"><i class="fas fa-flask"></i> Lab Tests</button>
+  </div>
+  <div id="portalTabContent">
+    ${renderPrescriptions()}
+  </div>`;
+}
+
+function portalTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const content = { presc: renderPrescriptions, vitals: renderVitals, history: renderHistory, labs: renderPatientLabs };
+  document.getElementById('portalTabContent').innerHTML = (content[tab]||renderPrescriptions)();
+  if (tab==='presc') setTimeout(()=>{ new QRCode(document.getElementById('qr1'),{text:'SDR-2026-0001|Rx:Apr29|Amlodipine5mg-Lisinopril10mg',width:100,height:100,colorDark:'#1a73e8',colorLight:'#fff'}); },100);
+}
+
+function openEditPatientProfile() {
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  const patient = state.patients.find(p => p.id === patientId) || { id: patientId, name:'Arjun Reddy', age:34, gender:'Male', blood:'B+', contact:'9876543210', doctor:'Dr. Priya Sharma', dept:'Cardiology' };
+  openModal('Edit Profile', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <div class="input-group"><i class="fas fa-user"></i><input type="text" class="form-control" id="edit_patient_name" value="${patient.name}" placeholder="Full Name"></div>
+      </div>
+      <div class="form-group">
+        <label>Age *</label>
+        <div class="input-group"><i class="fas fa-birthday-cake"></i><input type="number" class="form-control" id="edit_patient_age" value="${patient.age}" min="0"></div>
+      </div>
+      <div class="form-group">
+        <label>Gender *</label>
+        <select class="form-control" id="edit_patient_gender">
+          <option value="Male" ${patient.gender==='Male'?'selected':''}>Male</option>
+          <option value="Female" ${patient.gender==='Female'?'selected':''}>Female</option>
+          <option value="Other" ${patient.gender==='Other'?'selected':''}>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Blood Group</label>
+        <select class="form-control" id="edit_patient_blood">
+          <option value="A+" ${patient.blood==='A+'?'selected':''}>A+</option>
+          <option value="A-" ${patient.blood==='A-'?'selected':''}>A-</option>
+          <option value="B+" ${patient.blood==='B+'?'selected':''}>B+</option>
+          <option value="B-" ${patient.blood==='B-'?'selected':''}>B-</option>
+          <option value="AB+" ${patient.blood==='AB+'?'selected':''}>AB+</option>
+          <option value="AB-" ${patient.blood==='AB-'?'selected':''}>AB-</option>
+          <option value="O+" ${patient.blood==='O+'?'selected':''}>O+</option>
+          <option value="O-" ${patient.blood==='O-'?'selected':''}>O-</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Mobile Number *</label>
+        <div class="input-group"><i class="fas fa-phone"></i><input type="tel" class="form-control" id="edit_patient_contact" value="${patient.contact || ''}" placeholder="Mobile Number"></div>
+      </div>
+      <div class="form-group form-full">
+        <label>Doctor</label>
+        <div class="input-group"><i class="fas fa-user-md"></i><input type="text" class="form-control" id="edit_patient_doctor" value="${patient.doctor || ''}" readonly></div>
+      </div>
+      <div class="form-group form-full">
+        <label>Department</label>
+        <div class="input-group"><i class="fas fa-hospital-symbol"></i><input type="text" class="form-control" id="edit_patient_dept" value="${patient.dept || ''}" readonly></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitPatientProfileUpdate()"><i class="fas fa-save"></i> Save Changes</button>
+    </div>
+  `);
+}
+
+function submitPatientProfileUpdate() {
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  const patient = state.patients.find(p => p.id === patientId);
+  if (!patient) return;
+
+  const name = document.getElementById('edit_patient_name').value.trim();
+  const age = parseInt(document.getElementById('edit_patient_age').value, 10);
+  const gender = document.getElementById('edit_patient_gender').value;
+  const blood = document.getElementById('edit_patient_blood').value;
+  const contact = document.getElementById('edit_patient_contact').value.trim();
+
+  if (!name || !age || !gender || !contact) {
+    showToast('Please fill all required fields', 'warning');
+    return;
+  }
+
+  patient.name = name;
+  patient.age = age;
+  patient.gender = gender;
+  patient.blood = blood;
+  patient.contact = contact;
+  patient.lastVisit = new Date().toISOString().split('T')[0];
+
+  const user = state.users.find(u => u.patientId === patientId);
+  if (user) {
+    user.name = name;
+    user.initials = name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+    user.roleLabel = `Patient · ${patientId}`;
+  }
+
+  showToast('Profile updated successfully', 'success');
+  closeModal();
+  renderPanel('portal');
+}
+
+function renderPrescriptions() {
+  return `
+  <div class="rx-card">
+    <div class="rx-header">
+      <div>
+        <div style="font-weight:600;font-size:15px">Prescription #RX-2026-0429</div>
+        <div class="rx-doctor">Dr. Priya Sharma — Cardiology</div>
+      </div>
+      <div class="rx-date">Apr 29, 2026</div>
+      <button class="btn-sm btn-accent" style="margin-left:auto" onclick="downloadPrescription()"><i class="fas fa-download"></i> PDF</button>
+    </div>
+    <div class="rx-meds">
+      ${[['Amlodipine 5mg','1 tablet','Once daily (morning)'],['Lisinopril 10mg','1 tablet','Once daily (night)'],['Aspirin 75mg','1 tablet','Once daily (after food)']].map(([n,d,f])=>`
+      <div class="rx-med">
+        <i class="fas fa-pills" style="color:var(--accent);width:16px"></i>
+        <div class="rx-med-name">${n}</div>
+        <div class="rx-med-dose">${d}</div>
+        <div class="rx-med-freq">${f}</div>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:20px">
+      <div id="qr1"></div>
+      <div style="font-size:12px;color:var(--text3)">Scan QR at pharmacy counter<br>Next follow-up: May 14, 2026<br><span style="color:var(--warning)">⚠ Avoid high-sodium diet</span></div>
+    </div>
+  </div>
+  <div class="rx-card" style="opacity:.7">
+    <div class="rx-header">
+      <div>
+        <div style="font-weight:600;font-size:15px">Prescription #RX-2026-0415</div>
+        <div class="rx-doctor">Dr. Priya Sharma — Cardiology</div>
+      </div>
+      <div class="rx-date">Apr 15, 2026</div>
+      <button class="btn-sm btn-ghost" onclick="downloadPrescription()"><i class="fas fa-download"></i> PDF</button>
+    </div>
+    <div class="rx-meds">
+      <div class="rx-med"><i class="fas fa-pills" style="color:var(--accent);width:16px"></i><div class="rx-med-name">Amlodipine 10mg</div><div class="rx-med-dose">1 tablet</div><div class="rx-med-freq">Once daily</div></div>
+    </div>
+  </div>`;
+}
+
+function renderVitals() {
+  return `
+  <div class="two-col">
+    ${[['Blood Pressure','130 / 85 mmHg','fa-tint','#00d4ff','Normal range'],['Heart Rate','72 bpm','fa-heartbeat','#ff4757','Resting'],['SpO2','98%','fa-lungs','#00c896','Excellent'],['Temperature','36.8°C','fa-thermometer','#ffaa00','Normal']].map(([l,v,i,c,s])=>`
+    <div class="stat-card" style="--c:${c}">
+      <div class="stat-card-icon"><i class="fas ${i}"></i></div>
+      <div class="stat-card-num" style="font-size:24px">${v}</div>
+      <div class="stat-card-label">${l}</div>
+      <div class="stat-card-delta" style="color:var(--text3)">${s}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderHistory() {
+  return `<div class="timeline">
+    ${[
+      {date:'Apr 29','d':'Hypertension Follow-up','doc':'Dr. Priya Sharma'},
+      {date:'Apr 15','d':'Hypertension — Dosage Adjusted','doc':'Dr. Priya Sharma'},
+      {date:'Mar 28','d':'Initial Consultation','doc':'Dr. Priya Sharma'},
+    ].map(c=>`<div class="timeline-item"><div class="timeline-meta">${c.date}, 2026</div><div class="timeline-diagnosis">${c.d}</div><div style="font-size:13px;color:var(--text3);margin-top:4px">${c.doc}</div></div>`).join('')}
+  </div>`;
+}
+
+function renderPatientLabs() {
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  const patient = state.patients.find(p => p.id === patientId) || { name:'Unknown' };
+  const orders = state.labOrders.filter(o => o.patientId === patientId);
+  const pending = orders.filter(o => o.status === 'pending').length;
+  const completed = orders.filter(o => o.status === 'completed').length;
+  return `
+  <div class="section-head"><h3>My Laboratory Tests</h3></div>
+  <div class="stats-grid">
+    ${statCard('fa-flask', `${state.labTests.length}`, 'Available Tests', 'Book any test online', '#00d4ff', '0,212,255')}
+    ${statCard('fa-clock', `${pending}`, 'Pending Orders', 'Awaiting sample or result', '#ffaa00', '255,170,0')}
+    ${statCard('fa-check-circle', `${completed}`, 'Completed Tests', 'Results available', '#00c896', '0,200,150')}
+    ${statCard('fa-rupee-sign', `₹${orders.reduce((sum,o)=>{
+      const bill = state.bills.find(b => b.id === o.billId);
+      return sum + (bill ? Number(bill.amount.replace(/[₹,]/g, '')) : 0);
+    }, 0).toLocaleString()}`, 'My Lab Spend', 'Total lab billing', '#8b5cf6', '139,92,246')}
+  </div>
+  <div class="two-col" style="margin-bottom:24px">
+    <div class="card">
+      <div class="card-header"><h3>Available Tests</h3></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Test</th><th>Category</th><th>Price</th><th>Duration</th><th>Action</th></tr></thead>
+            <tbody>${state.labTests.map(test => `<tr>
+              <td><strong>${test.name}</strong><br><span style="font-size:12px;color:var(--text3)">${test.description}</span></td>
+              <td>${test.category}</td>
+              <td style="font-family:var(--font-mono);color:var(--accent3)">${test.price}</td>
+              <td>${test.duration}</td>
+              <td><button class="btn-sm btn-accent" onclick="bookLabTest('${test.id}')"><i class="fas fa-shopping-cart"></i> Book & Pay</button></td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>My Lab Orders</h3></div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order</th><th>Test</th><th>Date</th><th>Status</th><th>Bill</th><th>Action</th></tr></thead>
+            <tbody>${orders.map(order => {
+              const test = state.labTests.find(t => t.id === order.testId) || { name:'Unknown', price:'₹0' };
+              const bill = state.bills.find(b => b.id === order.billId);
+              const statusClass = order.status === 'completed' ? 'active' : 'pending';
+              return `<tr>
+                <td><span class="pid-badge">${order.id}</span></td>
+                <td>${test.name}</td>
+                <td>${order.date}</td>
+                <td><span class="status-badge status-${statusClass}">${order.status}</span></td>
+                <td>${bill ? bill.amount : '₹0'}</td>
+                <td><div class="action-btns">
+                  <button class="btn-sm btn-ghost" onclick="viewLabOrder('${order.id}')"><i class="fas fa-eye"></i></button>
+                  ${bill && bill.status !== 'paid' ? `<button class="btn-sm btn-accent" onclick="processPatientPayment('${bill.id}')"><i class="fas fa-credit-card"></i> Pay</button>` : ''}
+                </div></td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function bookLabTest(testId) {
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  const patient = state.patients.find(p => p.id === patientId);
+  const test = state.labTests.find(t => t.id === testId);
+  if (!patient || !test) return;
+  const orderId = `ORD-${String(state.labOrders.length + 1).padStart(3, '0')}`;
+  const billId = `BILL-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${String(state.bills.length + 1).padStart(3,'0')}`;
+  const today = new Date().toISOString().split('T')[0];
+  state.labOrders.push({ id: orderId, patientId, testId, requestedBy: patient.name, date: today, status: 'pending', result: null, billId });
+  state.bills.push({ id: billId, patientId, date: today, desc: `Lab Test — ${test.name}`, amount: test.price, status: 'pending' });
+  showToast(`Booked ${test.name}. Redirecting to billing...`, 'success');
+  setTimeout(() => renderBillingPage(billId), 500);
+}
+
+function downloadPrescription() {
+  const content = `Prescription for ${state.user?.name || 'Patient'}\nDate: 2026-04-29\nDoctor: Dr. Priya Sharma\n\nMedicines:\n- Amlodipine 5mg: 1 tablet once daily\n- Lisinopril 10mg: 1 tablet once daily\n- Aspirin 75mg: 1 tablet once daily after food\n\nInstructions:\nFollow-up on May 14, 2026. Avoid high-sodium diet.`;
+  downloadFile('Prescription_RX-2026-0429.txt', content);
+  showToast('Prescription downloaded successfully','success');
+}
+
+function downloadPatientRecords(patientId) {
+  const patient = state.patients.find(p=>p.id===patientId);
+  if (!patient) return;
+  const content = `Patient Records\nName: ${patient.name}\nID: ${patient.id}\nDoctor: ${patient.doctor}\nDepartment: ${patient.dept}\nContact: ${patient.contact}\nBlood: ${patient.blood}`;
+  downloadFile(`${patient.id}_records.txt`, content);
+  showToast('Download started','success');
+}
+
+// ═══════════════════════════════════════
+// BILLING PAGE
+// ═══════════════════════════════════════
+
+function renderBillingPage(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) {
+    showToast('Bill not found', 'warning');
+    renderPanel('portal');
+    return;
+  }
+  
+  const patient = state.patients.find(p => p.id === bill.patientId) || { name: 'Unknown Patient', id: 'N/A' };
+  const amount = bill.amount.replace(/[₹,]/g, '');
+  const order = state.labOrders.find(o => o.billId === billId);
+  const test = order ? state.labTests.find(t => t.id === order.testId) : null;
+  
+  // Change page to billing
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('billing-page').classList.add('active');
+  
+  // Update page title
+  document.title = `SMART Dr. | Bill ${bill.id}`;
+  
+  const billingHtml = `
+    <div class="billing-container">
+      <div class="billing-header">
+        <h1><i class="fas fa-file-invoice-dollar"></i> Payment Billing</h1>
+        <p>Complete your payment for laboratory test</p>
+      </div>
+      
+      <div class="billing-content">
+        <div class="bill-details">
+          <div class="bill-card">
+            <div class="bill-header">
+              <h3>Bill Details</h3>
+              <span class="bill-id">${bill.id}</span>
+            </div>
+            <div class="bill-info">
+              <div class="info-row">
+                <span class="label">Patient:</span>
+                <span class="value">${patient.name} (${patient.id})</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Test:</span>
+                <span class="value">${test ? test.name : bill.desc}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Date:</span>
+                <span class="value">${bill.date}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Description:</span>
+                <span class="value">${bill.desc}</span>
+              </div>
+              <div class="info-row total">
+                <span class="label">Amount:</span>
+                <span class="value amount">₹${amount}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-section">
+          <div class="payment-card">
+            <div class="payment-header">
+              <h3><i class="fas fa-qrcode"></i> Scan & Pay</h3>
+              <p>Scan the QR code with your payment app</p>
+            </div>
+            
+            <div class="qr-section">
+              <div id="paymentQrContainer" class="qr-container"></div>
+              <div class="qr-info">
+                <div class="qr-amount">₹${amount}</div>
+                <div class="qr-note">Scan to pay this amount</div>
+                <div class="qr-details">
+                  <div>Bill ID: ${bill.id}</div>
+                  <div>Hospital: SMART Dr.</div>
+                  <div>UPI ID: smartdr@upi</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="payment-actions">
+              <button class="btn-primary" onclick="simulateQrScan('${billId}')">
+                <i class="fas fa-mobile-alt"></i> Simulate QR Scan
+              </button>
+              <button class="btn-secondary" onclick="goBackToPortal()">
+                <i class="fas fa-arrow-left"></i> Back to Portal
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('billing-page').innerHTML = billingHtml;
+  
+  // Generate QR code
+  setTimeout(() => {
+    const qrContainer = document.getElementById('paymentQrContainer');
+    if (qrContainer) {
+      const paymentData = `BILL:${billId}|AMOUNT:${amount}|HOSPITAL:SMART Dr.|UPI:smartdr@upi`;
+      new QRCode(qrContainer, {
+        text: paymentData,
+        width: 200,
+        height: 200,
+        colorDark: '#202124',
+        colorLight: '#ffffff'
+      });
+    }
+  }, 100);
+}
+
+function simulateQrScan(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  
+  const amount = bill.amount.replace(/[₹,]/g, '');
+  
+  // Show payment confirmation modal
+  const modalHtml = `
+    <div class="modal-overlay" onclick="closePaymentConfirm()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-head">
+          <h3><i class="fas fa-check-circle"></i> Payment Confirmation</h3>
+          <button class="btn-close" onclick="closePaymentConfirm()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="payment-confirm">
+            <div class="confirm-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="confirm-details">
+              <h4>Payment Scanned Successfully</h4>
+              <div class="confirm-amount">Amount: ₹${amount}</div>
+              <div class="confirm-bill">Bill ID: ${billId}</div>
+              <div class="confirm-note">Please confirm payment to complete transaction</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-sm btn-ghost" onclick="closePaymentConfirm()">Cancel</button>
+          <button class="btn-sm btn-accent" onclick="completePayment('${billId}')">
+            <i class="fas fa-check"></i> Confirm Payment
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  const modalContainer = document.getElementById('billing-page') || document.body;
+  const modal = document.createElement('div');
+  modal.id = 'payment-confirm-modal';
+  modal.innerHTML = modalHtml;
+  modalContainer.appendChild(modal);
+}
+
+function closePaymentConfirm() {
+  const modal = document.getElementById('payment-confirm-modal');
+  if (modal) modal.remove();
+}
+
+function completePayment(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  
+  const patient = state.patients.find(p => p.id === bill.patientId) || { name: 'Unknown' };
+  const amount = bill.amount.replace(/[₹,]/g, '');
+  
+  // Mark bill as paid
+  bill.status = 'paid';
+  
+  // Create transaction record
+  const transaction = {
+    id: `TXN-${Date.now()}`,
+    billId,
+    patientId: bill.patientId,
+    patientName: patient.name,
+    amount,
+    method: 'qr_scan',
+    status: 'completed',
+    timestamp: new Date().toISOString(),
+    reference: `QR-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+    details: {
+      method: 'qr_scan',
+      scanned: true,
+      qrData: `BILL:${billId}|AMOUNT:${amount}`
+    }
+  };
+  
+  if (!state.transactions) state.transactions = [];
+  state.transactions.push(transaction);
+  
+  closePaymentConfirm();
+  showToast(`✓ Payment of ₹${amount} completed successfully!`, 'success');
+  
+  // Download receipt
+  setTimeout(() => downloadPaymentReceipt(billId), 1000);
+}
+
+function downloadPaymentReceipt(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  
+  const patient = state.patients.find(p => p.id === bill.patientId) || { name: 'Unknown', id: 'N/A' };
+  const transaction = state.transactions.find(t => t.billId === billId);
+  const order = state.labOrders.find(o => o.billId === billId);
+  const test = order ? state.labTests.find(t => t.id === order.testId) : null;
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Header
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SMART Dr. Hospital', 20, 25);
+  
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Payment Receipt', 20, 35);
+  doc.text('Laboratory Test Payment', 20, 42);
+  
+  // Bill Details
+  doc.setFontSize(11);
+  let y = 55;
+  doc.text(`Bill ID: ${bill.id}`, 20, y);
+  y += 7;
+  doc.text(`Patient: ${patient.name} (${patient.id})`, 20, y);
+  y += 7;
+  doc.text(`Test: ${test ? test.name : bill.desc}`, 20, y);
+  y += 7;
+  doc.text(`Date: ${bill.date}`, 20, y);
+  y += 7;
+  doc.text(`Amount Paid: ₹${bill.amount}`, 20, y);
+  y += 7;
+  if (transaction) {
+    doc.text(`Transaction ID: ${transaction.id}`, 20, y);
+    y += 7;
+    doc.text(`Payment Method: QR Code Scan`, 20, y);
+    y += 7;
+    doc.text(`Reference: ${transaction.reference}`, 20, y);
+    y += 7;
+    doc.text(`Timestamp: ${new Date(transaction.timestamp).toLocaleString()}`, 20, y);
+  }
+  
+  // Footer
+  y += 15;
+  doc.setFontSize(10);
+  doc.text('Thank you for choosing SMART Dr. Hospital', 20, y);
+  y += 5;
+  doc.text('For any queries, contact: support@smartdr.in', 20, y);
+  
+  doc.save(`${bill.id}_receipt.pdf`);
+  showToast('Payment receipt downloaded successfully!', 'success');
+  
+  // Go back to portal after download
+  setTimeout(() => goBackToPortal(), 1500);
+}
+
+function goBackToPortal() {
+  showPage('main-app');
+  switchPanel('portal');
+  document.title = 'SMART Dr. | Smart Hospital Management System';
+}
+
+// ═══════════════════════════════════════
+// BOOK APPOINTMENT
+// ═══════════════════════════════════════
+let selectedDay = 30, selectedMonth = 3, selectedYear = 2026, selectedSlot = null;
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderBook() {
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  const upcoming = state.appointments.filter(a => a.patientId === patientId);
+  return `
+  <div class="section-head"><h3>Book an Appointment</h3></div>
+  <div class="appointment-grid">
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>Select Doctor</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label>Department</label>
+            <select class="form-control" id="apptDept" onchange="filterDocSelect()">
+              <option>All Departments</option><option>Cardiology</option><option>Endocrinology</option><option>Pulmonology</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Doctor</label>
+            <select class="form-control" id="apptDoc">
+              ${state.doctors.filter(d=>d.available).map(d=>`<option value="${d.id}">${d.name} — ${d.dept}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group"><label>Reason for Visit</label>
+            <textarea class="form-control" id="apptReason" placeholder="Briefly describe your symptoms or reason..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <h3>Appointment Calendar</h3>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <select class="form-control" id="bookMonthSelect" onchange="changeBookMonthYear()">
+              ${monthNames.map((m,i)=>`<option value="${i}" ${i===selectedMonth?'selected':''}>${m}</option>`).join('')}
+            </select>
+            <select class="form-control" id="bookYearSelect" onchange="changeBookMonthYear()">
+              ${[2026,2027,2028,2029,2030].map(y=>`<option value="${y}" ${y===selectedYear?'selected':''}>${y}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="calendar-grid" id="calGrid"></div>
+          <div class="time-slot" id="timeSlots"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-header"><h3>Booking Summary</h3></div>
+        <div class="card-body">
+          <div id="bookSummary" style="color:var(--text3);font-size:14px">Select a date and time slot to see booking summary.</div>
+          <div id="bookBtn" style="display:none;margin-top:20px">
+            <button class="btn-submit" style="width:100%" onclick="confirmBook()"><i class="fas fa-check-circle"></i> Confirm Booking</button>
+            <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">You will receive an SMS reminder 24 hrs before your appointment</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:0">
+        <div class="card-header"><h3>My Upcoming Appointments</h3></div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            ${upcoming.length ? upcoming.map(a => {
+              const doctor = state.doctors.find(d => d.id === a.doctorId) || { name:'Unassigned' };
+              const statusClass = a.status === 'completed' ? 'active' : a.status === 'scheduled' ? 'pending' : 'critical';
+              return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
+                <div style="font-size:12px;font-family:var(--font-mono);color:var(--accent)">${a.date} · ${a.time}</div>
+                <div style="font-size:14px;font-weight:500;margin-top:4px">${doctor.name}</div>
+                <div style="font-size:12px;color:var(--text3)">${a.type} · ${a.dept}</div>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <span class="status-badge status-${statusClass}">${a.status}</span>
+                  <button class="btn-sm btn-danger" onclick="cancelBooking('${a.id}')">Cancel</button>
+                </div>
+              </div>`;
+            }).join('') : `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>No upcoming appointments yet. Please book one.</p></div>`}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function initCalendar() {
+  setTimeout(()=>{
+    const grid = document.getElementById('calGrid');
+    if (!grid) return;
+    const days = ['S','M','T','W','T','F','S'];
+    grid.innerHTML = days.map(d=>`<div class="cal-header-day">${d}</div>`).join('');
+    const firstDay = new Date(selectedYear, selectedMonth, 1).getDay();
+    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+    if (selectedDay > daysInMonth) selectedDay = daysInMonth;
+    for (let i=0;i<firstDay;i++) grid.innerHTML += `<div></div>`;
+    for (let d=1; d<=daysInMonth; d++) {
+      const isToday = d===selectedDay && selectedMonth===3 && selectedYear===2026;
+      const hasSlot = [1,3,5,7,10,12,14,16,20,22,24,28].includes(d);
+      grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${hasSlot?'has-slot':''} ${d===selectedDay?'selected':''}" onclick="selectDay(${d})">${d}</div>`;
+    }
+    showTimeSlots();
+  }, 50);
+}
+
+function changeBookMonthYear() {
+  const monthSelect = document.getElementById('bookMonthSelect');
+  const yearSelect = document.getElementById('bookYearSelect');
+  if (!monthSelect || !yearSelect) return;
+  selectedMonth = parseInt(monthSelect.value, 10);
+  selectedYear = parseInt(yearSelect.value, 10);
+  selectedSlot = null;
+  initCalendar();
+}
+
+function selectDay(d) {
+  selectedDay = d; selectedSlot = null;
+  initCalendar();
+}
+
+function filterDocSelect() {
+  const department = document.getElementById('apptDept')?.value || 'All Departments';
+  const options = state.doctors
+    .filter(d => department === 'All Departments' || d.dept === department)
+    .map(d => `<option value="${d.id}">${d.name} — ${d.dept}</option>`)
+    .join('');
+  const select = document.getElementById('apptDoc');
+  if (select) select.innerHTML = options;
+}
+
+function showTimeSlots() {
+  const wrap = document.getElementById('timeSlots');
+  if (!wrap) return;
+  const slots = ['09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00'];
+  const selectedDate = `${selectedYear}-${String(selectedMonth+1).padStart(2,'0')}-${String(selectedDay).padStart(2,'0')}`;
+  const booked = state.appointments.filter(a => a.date === selectedDate).map(a => a.time);
+  wrap.innerHTML = `<div style="grid-column:1/-1;font-size:12px;color:var(--text3);margin-bottom:4px">Available slots for ${monthNames[selectedMonth]} ${selectedDay}, ${selectedYear}:</div>` +
+    slots.map(s=>`<div class="slot-btn ${booked.includes(s)?'booked':''} ${s===selectedSlot?'selected':''}" onclick="${booked.includes(s)?'':`selectSlot('${s}')`}">${s}</div>`).join('');
+}
+
+function selectSlot(s) {
+  selectedSlot = s;
+  showTimeSlots();
+  const docSelect = document.getElementById('apptDoc');
+  const docVal = docSelect ? docSelect.options[docSelect.selectedIndex].text : 'Dr. Priya Sharma';
+  const patientName = state.user?.name || 'Guest Patient';
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  document.getElementById('bookSummary').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      ${infoRow('Date', `${monthNames[selectedMonth]} ${selectedDay}, ${selectedYear}`)}
+      ${infoRow('Time', `<span style="font-family:var(--font-mono);color:var(--accent)">${selectedSlot}</span>`)}
+      ${infoRow('Doctor', docVal)}
+      ${infoRow('Patient', `${patientName} — ${patientId}`)}
+    </div>`;
+  document.getElementById('bookBtn').style.display = 'block';
+}
+
+function confirmBook() {
+  const docId = document.getElementById('apptDoc')?.value || state.doctors.find(d => d.available)?.id;
+  const reason = document.getElementById('apptReason')?.value.trim() || 'General consultation';
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  const doctor = state.doctors.find(d => d.id === docId) || state.doctors[0];
+  const selectedDate = `${selectedYear}-${String(selectedMonth+1).padStart(2,'0')}-${String(selectedDay).padStart(2,'0')}`;
+  state.appointments.push({
+    id: `APT-2026-${String(state.appointments.length + 301).padStart(4,'0')}`,
+    date: selectedDate,
+    time: selectedSlot,
+    patientId,
+    doctorId: doctor.id,
+    dept: doctor.dept,
+    type: reason,
+    status: 'scheduled'
+  });
+  showToast(`Appointment booked for ${monthNames[selectedMonth]} ${selectedDay}, ${selectedYear} at ${selectedSlot}`, 'success');
+  selectedSlot = null;
+  document.getElementById('bookBtn').style.display = 'none';
+  renderPanel('book');
+}
+
+function cancelBooking(appointmentId) {
+  state.appointments = state.appointments.filter(a => a.id !== appointmentId);
+  renderPanel('book');
+  showToast('Booking cancelled', 'warning');
+}
+
+// ═══════════════════════════════════════
+// BILLS
+// ═══════════════════════════════════════
+function renderBills() {
+  const patientId = state.user?.patientId || 'SDR-2026-0001';
+  const bills = state.bills.filter(b => b.patientId === patientId);
+  const totalSpent = bills.reduce((sum, bill) => sum + Number(bill.amount.replace(/[₹,]/g, '')), 0);
+  const paidCount = bills.filter(b => b.status === 'paid').length;
+  const pendingCount = bills.filter(b => b.status !== 'paid').length;
+  return `
+  <div class="section-head"><h3>My Bills & Payments</h3></div>
+  <div class="stats-grid">
+    ${statCard('fa-receipt',`₹${totalSpent.toLocaleString()}`,'Total Spent',`${bills.length} invoices`,'#00d4ff','0,212,255')}
+    ${statCard('fa-check-circle',paidCount.toString(),'Bills Paid','Paid in full','#00c896','0,200,150')}
+    ${statCard('fa-clock',pendingCount.toString(),'Pending Bills','Requires action','#ffaa00','255,170,0')}
+    ${statCard('fa-shield-alt','Covered','Insurance Status','Up to ₹50,000','#8b5cf6','139,92,246')}
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Bill ID</th><th>Date</th><th>Description</th><th>Amount</th><th>Status</th><th>Payment Method</th><th>Actions</th></tr></thead>
+          <tbody>${bills.map(b=>{
+            const statusClass = b.status === 'paid' ? 'active' : 'pending';
+            return `<tr>
+              <td><span class="pid-badge">${b.id}</span></td>
+              <td>${b.date}</td>
+              <td>${b.desc}</td>
+              <td style="font-family:var(--font-mono);color:var(--accent3)">${b.amount}</td>
+              <td><span class="status-badge status-${statusClass}">${b.status}</span></td>
+              <td>${b.status !== 'paid' ? `<select class="form-control" id="patientPaymentMethod-${b.id}">${state.paymentMethods.map(m=>`<option value="${m.id}" ${m.active?'':'disabled'}>${m.label}</option>`).join('')}</select>` : '-'}</td>
+              <td><div class="action-btns">
+                <button class="btn-sm btn-ghost" onclick="downloadReceipt('${b.id}')"><i class="fas fa-download"></i> Receipt</button>
+                ${b.status !== 'paid' ? `<button class="btn-sm btn-accent" onclick="processPatientPayment('${b.id}')"><i class="fas fa-credit-card"></i> Pay</button>` : ''}
+              </div></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function payBill(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  bill.status = 'paid';
+  renderPanel('bills');
+  showToast('Payment processed successfully', 'success');
+}
+
+function downloadReceipt(billId) {
+  const bill = state.bills.find(b => b.id === billId);
+  if (!bill) return;
+  const content = `Receipt for ${bill.id}\nDate: ${bill.date}\nDescription: ${bill.desc}\nAmount: ${bill.amount}\nStatus: ${bill.status}`;
+  downloadFile(`${bill.id}_receipt.txt`, content);
+  showToast('Receipt downloaded', 'success');
+}
+
+// ─── MODAL ───
+function openModal(title, content) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalContent').innerHTML = content;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+function openNotifications() {
+  openModal('Notifications', `
+    <div style="display:flex;flex-direction:column;gap:12px;padding:8px">
+      ${state.notifications.length ? state.notifications.map(n => `
+        <div style="border:1px solid var(--border);border-radius:12px;padding:14px;background:${n.read ? 'var(--surface2)' : 'var(--surface3)'};opacity:${n.read ? 0.8 : 1}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+            <strong style="font-size:14px;color:var(--text)">${n.title}</strong>
+            <span style="font-size:11px;color:var(--text2)">${n.time}</span>
+          </div>
+          <div style="margin-top:8px;font-size:13px;color:var(--text2)">${n.message}</div>
+        </div>
+      `).join('') : `<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications available.</p></div>`}
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+      <button class="btn-outline" onclick="closeModal()">Close</button>
+      <button class="btn-sm btn-accent" onclick="markAllNotificationsRead()">Mark all read</button>
+    </div>
+  `);
+}
+
+function markAllNotificationsRead() {
+  state.notifications.forEach(n => n.read = true);
+  closeModal();
+  showToast('All notifications marked as read', 'success');
+}
+
+function openSettings() {
+  const prefs = state.preferences;
+  openModal('Settings', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Allow Notifications</label>
+        <label class="switch"><input type="checkbox" id="settings_allow_notifications" ${prefs.allowNotifications ? 'checked' : ''}><span class="slider"></span></label>
+      </div>
+      <div class="form-group">
+        <label>Email Alerts</label>
+        <label class="switch"><input type="checkbox" id="settings_email_alerts" ${prefs.emailAlerts ? 'checked' : ''}><span class="slider"></span></label>
+      </div>
+      <div class="form-group">
+        <label>Auto Booking Reminders</label>
+        <label class="switch"><input type="checkbox" id="settings_auto_booking" ${prefs.autoBookingReminders ? 'checked' : ''}><span class="slider"></span></label>
+      </div>
+      <div class="form-group">
+        <label>Theme</label>
+        <select class="form-control" id="settings_theme">
+          <option value="light" ${prefs.darkMode ? '' : 'selected'}>Light</option>
+          <option value="dark" ${prefs.darkMode ? 'selected' : ''}>Dark</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-accent" onclick="saveSettings()">Save Settings</button>
+    </div>
+  `);
+}
+
+function saveSettings() {
+  state.preferences.allowNotifications = document.getElementById('settings_allow_notifications').checked;
+  state.preferences.emailAlerts = document.getElementById('settings_email_alerts').checked;
+  state.preferences.autoBookingReminders = document.getElementById('settings_auto_booking').checked;
+  state.preferences.darkMode = document.getElementById('settings_theme').value === 'dark';
+  if (state.preferences.darkMode) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+  closeModal();
+  showToast('Settings saved successfully', 'success');
+}
+
+// ─── TOAST ───
+function showToast(msg, type='') {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success:'fa-check-circle', warning:'fa-exclamation-triangle', '':'fa-info-circle' };
+  const colors = { success:'var(--green)', warning:'var(--warning)', '':'var(--accent)' };
+  t.innerHTML = `<i class="fas ${icons[type]||icons['']}" style="color:${colors[type]||colors['']}"></i><span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+// ─── INIT ───
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
